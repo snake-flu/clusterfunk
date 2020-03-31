@@ -6,7 +6,7 @@ class Phylotyper:
         self.threshold = threshold
         pass
 
-    def phylotype_nodes(self, node, phylotype=""):
+    def phylotype_nodes(self, node, phylotype="1"):
         node.phylotype = "\"" + phylotype + "\""
         node.annotations.add_bound_attribute("phylotype")
 
