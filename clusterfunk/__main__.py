@@ -45,6 +45,14 @@ def main(args=None):
         type=float,
         help='branch threshold used to distinguish new phylotype (default: 5E-6)')
 
+    subparser_phylotype.add_argument(
+        '-csv',
+        '--csv',
+        dest='csv',
+        action='store_true',
+        default=False,
+        help='Boolean flag, should the output be a csv of tips instead of an annotated tree file')
+
     subparser_phylotype.set_defaults(func=clusterfunk.subcommands.phylotype.run)
 
     args = parser.parse_args()
