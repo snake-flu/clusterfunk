@@ -1,3 +1,3 @@
-__all__ = ["phylotype"]
+__all__ = ["phylotype", "annotate_tree"]
 
 from clusterfunk.subcommands import *

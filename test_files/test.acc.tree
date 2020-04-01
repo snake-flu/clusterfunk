@@ -1,0 +1,22 @@
+#NEXUS
+
+BEGIN TAXA;
+    DIMENSIONS NTAX=10;
+    TAXLABELS
+        virus1
+        virus2
+        virus3
+        virus4
+        virus5
+        virus6
+        virus7
+        virus8
+        virus9
+        virus10
+  ;
+END;
+
+BEGIN TREES;
+    TREE 1 = [&R] ((((((virus1:0.1[&UK=True],virus2:0.12[&UK=True]):0.08[&UK=True],(virus3:0.011[&UK=False],virus4:0.0087[&UK=True]):0.15[&UK=True]):0.03[&UK=True],virus5:0.21[&UK=False]):0.2[&UK=True],(virus6:0.45[&UK=True],virus7:0.4[&UK=True]):0.02[&UK=True]):0.1[&UK=True],virus8:0.4[&UK=False]):0.1[&UK=False],(virus9:0.04[&UK=False],virus10:0.03[&UK=False]):0.6[&UK=False])[&UK=False];
+END;
+
