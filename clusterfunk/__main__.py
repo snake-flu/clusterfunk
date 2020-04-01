@@ -105,7 +105,7 @@ def main(args=None):
 
     subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tree.run)
 
-    # _____________________________ phylotype ______________________________#
+    # _____________________________ extract_tip_annotations ______________________________#
     subparser_extract_tip_annotations = subparsers.add_parser(
         "extract_tip_annotations",
         aliases=['extract_dat_tree'],
@@ -133,6 +133,27 @@ def main(args=None):
         help='Space separated list of traits to extract from tree')
 
     subparser_extract_tip_annotations.set_defaults(func=clusterfunk.subcommands.extract_tip_annotations.run)
+    # _____________________________ get_taxa ______________________________#
+
+    subparser_get_taxa = subparsers.add_parser(
+        "get_taxa",
+        aliases=['get_dat_taxa'],
+        usage="clusterfunk get_taxa  <input> <output> ",
+        help="extracts taxa labels from tips in a tree",
+    )
+
+    subparser_get_taxa.add_argument(
+        "input",
+        metavar='input',
+        type=str,
+        help='The input file currently must be a nexus')
+
+    subparser_get_taxa.add_argument(
+        "output",
+        metavar='output',
+        type=str,
+        help='The output file is a text file')
+    subparser_get_taxa.set_defaults(func=clusterfunk.subcommands.get_taxa.run)
 
     args = parser.parse_args()
 

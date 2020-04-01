@@ -46,7 +46,8 @@ class TreeAnnotator:
         return value
 
     def reconstruct_ancestors(self, node, parent_states, acctran, name):
-        node_states = getattr(node, name) if isinstance(getattr(node, name), list) else [getattr(node, name)]
+        node_states = node.annotations.get_value(name) if isinstance(node.annotations.get_value(name), list) else [
+            node.annotations.get_value(name)]
 
         if node.taxon is not None and len(node_states) == 1 and node_states[0] is not None:
             assigned_states = node_states
@@ -61,8 +62,9 @@ class TreeAnnotator:
                 # can we delay
                 child_states = []
                 for child in node.child_node_iter():
-                    child_states += getattr(child, name) if isinstance(getattr(child, name), list) else [
-                        getattr(child, name)]
+                    child_states += child.annotations.get_value(name) if isinstance(child.annotations.get_value(name),
+                                                                                    list) else [
+                        child.annotations.get_value(name)]
 
                 assigned_states = [state for state in assigned_states if
                                    state in parent_states and state in child_states] if len(
