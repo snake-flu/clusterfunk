@@ -105,6 +105,35 @@ def main(args=None):
 
     subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tree.run)
 
+    # _____________________________ phylotype ______________________________#
+    subparser_extract_tip_annotations = subparsers.add_parser(
+        "extract_tip_annotations",
+        aliases=['extract_dat_tree'],
+        usage="clusterfunk extract_annotations [--traits]  <input> <output> ",
+        help="extracts annotations from tips in a tree",
+    )
+
+    subparser_extract_tip_annotations.add_argument(
+        "input",
+        metavar='input',
+        type=str,
+        help='The input file currently must be a nexus')
+
+    subparser_extract_tip_annotations.add_argument(
+        "output",
+        metavar='output',
+        type=str,
+        help='The output file currently must be a csv')
+    subparser_extract_tip_annotations.add_argument(
+        "-t",
+        "--traits",
+        metavar='traits',
+        type=str,
+        nargs="+",
+        help='Space separated list of traits to extract from tree')
+
+    subparser_extract_tip_annotations.set_defaults(func=clusterfunk.subcommands.extract_tip_annotations.run)
+
     args = parser.parse_args()
 
     if hasattr(args, "func"):
