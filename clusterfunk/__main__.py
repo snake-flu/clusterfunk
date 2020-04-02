@@ -155,6 +155,50 @@ def main(args=None):
         help='The output file is a text file')
     subparser_get_taxa.set_defaults(func=clusterfunk.subcommands.get_taxa.run)
 
+    # _____________________________ label_transitions ______________________________#
+
+    subparser_label_transitions = subparsers.add_parser(
+        "label_transitions",
+        aliases=['label_dat_transition'],
+        usage="clusterfunk label_transitions [--trait] [--parent] [--child] <input> <output>",
+        help="labels counts and labels transitions on a tree",
+    )
+
+    subparser_label_transitions.add_argument(
+        "input",
+        metavar='input',
+        type=str,
+        help='The input file currently must be a nexus')
+
+    subparser_label_transitions.add_argument(
+        "output",
+        metavar='output',
+        type=str,
+        help='The output file is a text file')
+
+    subparser_label_transitions.add_argument(
+        "-t",
+        "--trait",
+        metavar='trait',
+        type=str,
+        help=' Trait key to extract from tree')
+
+    subparser_label_transitions.add_argument(
+        "-p",
+        "--parent_state",
+        metavar='parent_state',
+        type=str,
+        help='parent state for transitions')
+
+    subparser_label_transitions.add_argument(
+        "-c",
+        "--child_state",
+        metavar='child_state',
+        type=str,
+        help='child state for transitions')
+
+    subparser_label_transitions.set_defaults(func=clusterfunk.subcommands.label_transitions.run)
+
     args = parser.parse_args()
 
     if hasattr(args, "func"):
