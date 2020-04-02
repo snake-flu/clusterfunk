@@ -205,6 +205,14 @@ def main(args=None):
         default=False,
         help='A boolean flag to output a nexus for each transition. In this case the ouput argument is treated as a directory and made if it doesn\'t exist')
 
+    subparser_label_transitions.add_argument(
+        "-ip",
+        "--include_parent",
+        dest='include_parent',
+        action='store_true',
+        default=False,
+        help='A boolean flag to inlcude transition parent node in exploded trees')
+
     subparser_label_transitions.set_defaults(func=clusterfunk.subcommands.label_transitions.run)
 
     args = parser.parse_args()

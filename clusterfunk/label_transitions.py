@@ -1,11 +1,14 @@
 import dendropy
+
+
 class TransitionAnnotator:
-    def __init__(self, parent_state, child_state, trait):
+    def __init__(self, parent_state, child_state, trait, include_parent):
         self.parent_state = parent_state
         self.child_state = child_state
         self.trait = trait
         self.count = 0
         self.transition_points = []
+        self.include_parent = include_parent
         pass
 
     def annotate_transitions(self, tree):
@@ -35,5 +38,9 @@ class TransitionAnnotator:
         self.annotate_transitions(tree)
         trees = []
         for node in self.transition_points:
-            trees.append(dendropy.Tree(seed_node=node))
+            new_root = node
+            if self.include_parent:
+                if node.parent_node is not None:
+                    new_root = node.parent_node
+            trees.append({"id": node.annotations.get_value('introduction'), "tree": dendropy.Tree(seed_node=new_root)})
         return trees

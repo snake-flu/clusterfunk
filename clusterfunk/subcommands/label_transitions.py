@@ -5,7 +5,7 @@ from clusterfunk.label_transitions import *
 
 def run(options):
     tree = dendropy.Tree.get(path=options.input, schema="nexus")
-    annotator = TransitionAnnotator(options.parent_state, options.child_state, options.trait)
+    annotator = TransitionAnnotator(options.parent_state, options.child_state, options.trait, options.include_parent)
 
     if options.exploded_trees:
         trees = annotator.split_at_transitions(tree)
@@ -14,8 +14,7 @@ def run(options):
             os.makedirs(options.output)
         i = 1
         for tree in trees:
-            label = tree.seed_node.annotations.get_value("introduction")  # TODO remove hardcoded label
-            tree.write(path=options.output + "/" + label + '.tree', schema="nexus")
+            tree["tree"].write(path=options.output + "/" + tree["id"] + '.tree', schema="nexus")
             i += 1
 
     else:
