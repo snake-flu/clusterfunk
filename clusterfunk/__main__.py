@@ -197,6 +197,14 @@ def main(args=None):
         type=str,
         help='child state for transitions')
 
+    subparser_label_transitions.add_argument(
+        "-e",
+        "--exploded_trees",
+        dest='exploded_trees',
+        action='store_true',
+        default=False,
+        help='A boolean flag to output a nexus for each transition. In this case the ouput argument is treated as a directory and made if it doesn\'t exist')
+
     subparser_label_transitions.set_defaults(func=clusterfunk.subcommands.label_transitions.run)
 
     args = parser.parse_args()
