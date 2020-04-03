@@ -26,17 +26,19 @@ class TreeAnnotator:
                 node.annotations.add_bound_attribute(a)
 
     def fitch_parsimony(self, node, name):
-        if node.taxon is not None:
+        if len(node.child_nodes()) == 0:
             tip_annotation = node.annotations.get_value(name) if node.annotations.get_value(name) is not None else []
             return tip_annotation if isinstance(tip_annotation, list) else [tip_annotation]
 
         union = set()
         intersection = set()
 
+        i = 0
         for child in node.child_node_iter():
             child_states = self.fitch_parsimony(child, name)
             union = union.union(child_states)
-            intersection = set(child_states) if len(intersection) == 0 else intersection.intersection(child_states)
+            intersection = set(child_states) if i == 0 else intersection.intersection(child_states)
+            i += 1
 
         value = list(intersection) if len(intersection) > 0 else list(union)
         setattr(node, name, value[0] if len(value) == 1 else value)
