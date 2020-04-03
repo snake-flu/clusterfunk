@@ -103,6 +103,14 @@ def main(args=None):
         action='store_true',
         help="Boolean flag to use deltran reconstruction")
 
+    subparser_annotate.add_argument(
+        '-a',
+        '--ancestral_state',
+        metavar='ancestral_state',
+        action='store',
+        nargs="+",
+        help="Option to Set the ancestral state for the tree. In same order of traits")
+
     subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tree.run)
 
     # _____________________________ extract_tip_annotations ______________________________#

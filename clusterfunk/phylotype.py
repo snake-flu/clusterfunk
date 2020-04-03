@@ -7,7 +7,7 @@ class Phylotyper:
         self.csv = csv
         pass
 
-    def phylotype_nodes(self, node, phylotype="1"):
+    def phylotype_nodes(self, node, phylotype="p"):
         node.phylotype = "\"" + phylotype + "\""
         node.annotations.add_bound_attribute("phylotype")
 

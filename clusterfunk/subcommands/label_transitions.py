@@ -1,11 +1,13 @@
 import dendropy
 import os
 from clusterfunk.label_transitions import *
+from clusterfunk.utils import check_str_for_bool
 
 
 def run(options):
     tree = dendropy.Tree.get(path=options.input, schema="nexus")
-    annotator = TransitionAnnotator(options.parent_state, options.child_state, options.trait, options.include_parent)
+    annotator = TransitionAnnotator(check_str_for_bool(options.parent_state), check_str_for_bool(options.child_state),
+                                    options.trait, options.include_parent)
 
     if options.exploded_trees:
         trees = annotator.split_at_transitions(tree)

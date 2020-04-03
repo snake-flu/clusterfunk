@@ -11,13 +11,18 @@ class TreeAnnotator:
         for tip in annotations:
             self.annotate_node(tip, annotations[tip])
 
-    def annotate_nodes_from_tips(self, name, acctran):
+    def annotate_nodes_from_tips(self, name, acctran, parent_states=None):
+        if parent_states is None:
+            parent_states = []
         self.fitch_parsimony(self.root, name)
-        self.reconstruct_ancestors(self.root, [], acctran, name)
+
+        if parent_states is None:
+            self.reconstruct_ancestors(self.root, [], acctran, name)
+        else:
+            self.reconstruct_ancestors(self.root, [parent_states], acctran, name)
 
     def annotate_node(self, tip_label, annotations):
-        filter = lambda taxon: True if taxon.label == tip_label else False
-        node = self.tree.find_node_with_taxon(filter)
+        node = self.tree.find_node_with_taxon(lambda taxon: True if taxon.label == tip_label else False)
         if node is None:
             raise KeyError("Taxon %s not found in tree" % tip_label)
         for a in annotations:
@@ -26,17 +31,19 @@ class TreeAnnotator:
                 node.annotations.add_bound_attribute(a)
 
     def fitch_parsimony(self, node, name):
-        if node.taxon is not None:
+        if len(node.child_nodes()) == 0:
             tip_annotation = node.annotations.get_value(name) if node.annotations.get_value(name) is not None else []
             return tip_annotation if isinstance(tip_annotation, list) else [tip_annotation]
 
         union = set()
         intersection = set()
 
+        i = 0
         for child in node.child_node_iter():
             child_states = self.fitch_parsimony(child, name)
             union = union.union(child_states)
-            intersection = set(child_states) if len(intersection) == 0 else intersection.intersection(child_states)
+            intersection = set(child_states) if i == 0 else intersection.intersection(child_states)
+            i += 1
 
         value = list(intersection) if len(intersection) > 0 else list(union)
         setattr(node, name, value[0] if len(value) == 1 else value)

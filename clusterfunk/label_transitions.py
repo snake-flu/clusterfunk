@@ -24,8 +24,8 @@ class TransitionAnnotator:
         for child in node.child_node_iter():
             child_state = child.annotations.get_value(self.trait)
 
-            if str(child_state) == str(self.child_state):
-                if str(state) == str(self.parent_state):
+            if child_state == self.child_state:
+                if state == self.parent_state:
                     self.transition_points.append(child)
                     self.count += 1
 
