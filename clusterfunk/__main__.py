@@ -223,6 +223,49 @@ def main(args=None):
 
     subparser_label_transitions.set_defaults(func=clusterfunk.subcommands.label_transitions.run)
 
+    # _____________________________ subtype ______________________________#
+    subparser_subtyper = subparsers.add_parser(
+        "subtype",
+        aliases=['subtype_dat_sample'],
+        usage="clusterfunk subtype [--separator] [--index] [--taxon] <input> <output> ",
+        help="Annotates a specified tip with a specified trait ",
+    )
+    subparser_subtyper.add_argument(
+        "-i",
+        "--index",
+        dest="index",
+        type=int,
+        help="The index of the trait to reconstruct when the tip label is split by the  separator"
+    )
+
+    subparser_subtyper.add_argument(
+        "-s",
+        "--separator",
+        dest="separator",
+        type=str,
+        help="optional separator used to get trait"
+    )
+    subparser_subtyper.add_argument(
+        "input",
+        metavar='input',
+        type=str,
+        help='The input file currently must be a nexus')
+
+    subparser_subtyper.add_argument(
+        "output",
+        metavar='output',
+        type=str,
+        help='The output file is a text file')
+
+    subparser_subtyper.add_argument(
+        "-t"
+        "--taxon",
+        dest='taxon',
+        type=str,
+        help='The tip label to get')
+
+    subparser_subtyper.set_defaults(func=clusterfunk.subcommands.subtyper.run)
+
     args = parser.parse_args()
 
     if hasattr(args, "func"):

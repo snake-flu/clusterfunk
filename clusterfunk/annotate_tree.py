@@ -7,6 +7,15 @@ class TreeAnnotator:
         self.root = tree.seed_node
         pass
 
+    def annotate_tips_from_label(self, traitName, index, separator):
+        annotations = {}
+        for tip in self.tree.leaf_node_iter():
+            trait = {}
+            trait[traitName] = tip.taxon.label.split(separator)[index]
+            annotations[tip.taxon.label] = trait
+
+        self.annotate_tips(annotations);
+
     def annotate_tips(self, annotations):
         for tip in annotations:
             self.annotate_node(tip, annotations[tip])

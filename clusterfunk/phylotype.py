@@ -10,7 +10,6 @@ class Phylotyper:
     def phylotype_nodes(self, node, phylotype="p"):
         node.phylotype = "\"" + phylotype + "\""
         node.annotations.add_bound_attribute("phylotype")
-
         i = 1
         for child in node.child_node_iter():
             suffix = ""
