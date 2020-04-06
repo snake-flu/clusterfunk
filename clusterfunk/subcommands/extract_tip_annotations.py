@@ -4,7 +4,7 @@ from clusterfunk.extract_tip_annotations import *
 
 
 def run(options):
-    tree = dendropy.Tree.get(path=options.input, schema="nexus")
+    tree = dendropy.Tree.get(path=options.input, schema="nexus", preserve_underscores=True)
     annotation_extractor = AnnotationExtractor(tree)
     annotations = annotation_extractor.get_annotations(options.traits)
 

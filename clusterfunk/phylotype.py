@@ -20,7 +20,7 @@ class Phylotyper:
             self.phylotype_nodes(child, phylotype + suffix)
 
     def run(self, input_file, output_file):
-        tree = dendropy.Tree.get(path=input_file, schema="nexus")
+        tree = dendropy.Tree.get(path=input_file, schema="nexus", preserve_underscores=True)
         self.phylotype_nodes(tree.seed_node)
         if self.csv:
             tips = [{"taxon": x.taxon, "phylotype": x.phylotype.replace('"', '')} for x in tree.leaf_node_iter()]

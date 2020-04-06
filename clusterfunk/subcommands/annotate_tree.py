@@ -9,7 +9,7 @@ def run(options):
     if (options.deltran and options.acctran):
         raise ValueError("Can not use both acctran and deltran flags")
 
-    tree = dendropy.Tree.get(path=options.input, schema="nexus")
+    tree = dendropy.Tree.get(path=options.input, schema="nexus", preserve_underscores=True)
     annotator = TreeAnnotator(tree)
 
     if options.traits_file is not None:

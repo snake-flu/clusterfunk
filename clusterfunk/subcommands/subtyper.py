@@ -4,7 +4,7 @@ from clusterfunk.subtyper import Subtyper
 
 
 def run(options):
-    tree = dendropy.Tree.get(path=options.input, schema="nexus")
+    tree = dendropy.Tree.get(path=options.input, schema="nexus", preserve_underscores=True)
     subtyper = Subtyper(tree, options.index, options.separator)
     subtype = subtyper.get_subtype(options.taxon)
 

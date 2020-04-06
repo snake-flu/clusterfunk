@@ -37,7 +37,8 @@ class Subtyper:
         # If there aren't any sibling tips then we have to traverse the cousins to get the traits down those lines
         grand_parent = tip.parent_node.parent_node
 
-        cousins_traits = list(set([tip.annotations.get_value(self.traitName) for tip in grand_parent.leaf_iter()]))
+        cousins_traits = list(set([leaf.annotations.get_value(self.traitName) for leaf in grand_parent.leaf_iter() if
+                                   leaf != tip and len(leaf.annotations.get_value(self.traitName)) > 0]))
         if len(cousins_traits) == 1:
             return cousins_traits[0]
 

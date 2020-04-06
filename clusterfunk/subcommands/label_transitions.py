@@ -5,7 +5,7 @@ from clusterfunk.utils import check_str_for_bool
 
 
 def run(options):
-    tree = dendropy.Tree.get(path=options.input, schema="nexus")
+    tree = dendropy.Tree.get(path=options.input, schema="nexus", preserve_underscores=True)
     annotator = TransitionAnnotator(check_str_for_bool(options.parent_state), check_str_for_bool(options.child_state),
                                     options.trait, options.include_parent)
 
