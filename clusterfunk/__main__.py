@@ -258,7 +258,7 @@ def main(args=None):
         help='The output file is a text file')
 
     subparser_subtyper.add_argument(
-        "-t"
+        "-t",
         "--taxon",
         dest='taxon',
         type=str,
