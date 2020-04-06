@@ -1,7 +1,7 @@
 import unittest
 import dendropy
 
-from clusterfunk.subtyper import Subtyper
+from clusterfunk.subtyper import Subtyper, collapse_nodes
 
 
 class MyTestCase(unittest.TestCase):
@@ -32,6 +32,15 @@ class MyTestCase(unittest.TestCase):
         subtyper = Subtyper(tree, 2, "|")
 
         self.assertEqual(subtyper.get_subtype("Testland___TLD32___2020|EPI_ISL_667||Testland|||2020-03-11"), "B")
+
+    def test_empty_subtype(self):
+        tree = dendropy.Tree.get(path="../test_files/EPI_ISL_413581X.aln.fasta.nexus.tree", schema="nexus",
+                                 preserve_underscores=True)
+
+        collapse_nodes(tree, lambda x: x.edge.length == 0)
+        subtyper = Subtyper(tree, 2, "|")
+
+        self.assertEqual(subtyper.get_subtype("Netherlands___Oss_1363500___2020|EPI_ISL_413581X|2020-02-29"), "B")
 
 
 if __name__ == '__main__':

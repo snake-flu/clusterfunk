@@ -264,6 +264,14 @@ def main(args=None):
         type=str,
         help='The tip label to get')
 
+    subparser_subtyper.add_argument(
+        "-dp",
+        "--deresolve_polytomies",
+        dest='collapse',
+        action='store_true',
+        default=False,
+        help='A boolean flag to collapse branches with length 0. This provides more resolution in assigning lineages')
+
     subparser_subtyper.set_defaults(func=clusterfunk.subcommands.subtyper.run)
 
     args = parser.parse_args()

@@ -15,6 +15,12 @@ def trim_traits(trait_list, index):
     return [l[0:index] for l in trait_list]
 
 
+def collapse_nodes(tree, predicate):
+    for node in tree.preorder_node_iter(predicate):
+        if not node.is_leaf():
+            node.edge.collapse(adjust_collapsed_head_children_edge_lengths=True)
+
+
 class Subtyper:
     def __init__(self, tree, index, separator):
         self.tree = tree
