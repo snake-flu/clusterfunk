@@ -9,4 +9,4 @@ def run(options):
     subtype = subtyper.get_subtype(options.taxon)
 
     with open(options.output, "w") as output_file:
-        output_file.write(options.taxon, subtype)
+        output_file.write("%s,%s" % (options.taxon, subtype))
