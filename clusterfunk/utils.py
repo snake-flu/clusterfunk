@@ -13,7 +13,7 @@ def check_str_for_bool(s):
 
 
 def parse_tree(file, format):
-    return dendropy.Tree.get(path=file, schema=format.lower(), perserve_underscores=True)
+    return dendropy.Tree.get(path=file, schema=format.lower(), preserve_underscores=True)
 
 
 def write_tree(tree, file, format):

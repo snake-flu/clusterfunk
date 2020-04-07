@@ -146,6 +146,8 @@ def main(args=None):
         aliases=['extract_dat_tree'],
         usage="clusterfunk extract_annotations --traits country -i my.annotated.tree -o annotations.csv",
         help="extracts annotations from tips in a tree",
+        parents=[shared_arguments_parser]
+
     )
 
     subparser_extract_tip_annotations.add_argument(
@@ -165,6 +167,8 @@ def main(args=None):
         aliases=['get_dat_taxa'],
         usage="clusterfunk get_taxa  -i input.tree -o taxa.txt",
         help="extracts taxa labels from tips in a tree",
+        parents=[shared_arguments_parser]
+
     )
 
     subparser_get_taxa.set_defaults(func=clusterfunk.subcommands.get_taxa.run)
@@ -174,8 +178,10 @@ def main(args=None):
     subparser_label_transitions = subparsers.add_parser(
         "label_transitions",
         aliases=['label_dat_transition'],
-        usage="clusterfunk label_transitions --trait UK --parent False --child True <input> <output>",
+        usage="clusterfunk label_transitions --trait UK --from False --to True --transition_name introduction -i my.tree -o my.labeled.tree",
         help="counts and labels transitions of binary traits on a tree",
+        parents=[shared_arguments_parser]
+
     )
 
     subparser_label_transitions.add_argument(
@@ -183,6 +189,7 @@ def main(args=None):
         "--trait",
         metavar='trait',
         type=str,
+        required=True,
         help=' Trait whose transitions are begin put on tree')
 
     subparser_label_transitions.add_argument(
@@ -199,6 +206,7 @@ def main(args=None):
         "--transition_name",
         dest='transition_name',
         type=str,
+        required=True,
         help='The name of the annotation that will hold transitions. This also will form the base of the transition '
              'label.')
 
@@ -224,14 +232,16 @@ def main(args=None):
     subparser_subtyper = subparsers.add_parser(
         "subtype",
         aliases=['subtype_dat_sample'],
-        usage="clusterfunk subtype [--separator] [--index] [--taxon] <input> <output> ",
+        usage="clusterfunk subtype --separator \"|\" --index 2 --taxon my|fav|taxon -i my.tree -o my.csv ",
         help="Annotates a specified tip with a specified trait ",
+        parents=[shared_arguments_parser]
+
     )
     subparser_subtyper.add_argument(
-        "-i",
         "--index",
         dest="index",
         type=int,
+        required=True,
         help="The index of the trait to reconstruct when the tip label is split by the  separator"
     )
 
@@ -240,6 +250,7 @@ def main(args=None):
         "--separator",
         dest="separator",
         type=str,
+        required=True,
         help="optional separator used to get trait"
     )
 
@@ -248,6 +259,7 @@ def main(args=None):
         "--taxon",
         dest='taxon',
         type=str,
+        required=True,
         help='The tip label to get')
 
 
