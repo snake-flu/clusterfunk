@@ -2,16 +2,25 @@ import dendropy
 
 
 class TransitionAnnotator:
-    def __init__(self, parent_state, child_state, trait, include_parent):
-        self.parent_state = parent_state
-        self.child_state = child_state
+    def __init__(self, trait, include_parent, transition_name):
+
         self.trait = trait
+        self.From = None
+        self.to = None
         self.count = 0
         self.transition_points = []
         self.include_parent = include_parent
-        pass
+        self.found_transition = False;
 
-    def annotate_transitions(self, tree):
+        self.transition_name = transition_name
+
+    def annotate_transitions(self, tree, From=None, to=None):
+
+        if From is None and to is None:
+            raise ValueError("Must provide at least a from or to state")
+
+        self.From = From
+        self.to = to
         self.count = 0
         self.transition_points = []
         node = tree.seed_node
@@ -24,18 +33,39 @@ class TransitionAnnotator:
         for child in node.child_node_iter():
             child_state = child.annotations.get_value(self.trait)
 
-            if child_state == self.child_state:
-                if state == self.parent_state:
-                    self.transition_points.append(child)
-                    self.count += 1
+            if self.From is not None:
+                if state == self.From:
+                    self.found_transition = False
+                    if self.to is not None:
+                        if child_state == self.to:
+                            self.transition_points.append(child)
+                            self.count += 1
+                            self.found_transition = True
+                    else:
+                        if child_state != state:
+                            self.transition_points.append(child)
+                            self.count += 1
+                            self.found_transition = True
+                        else:
+                            self.found_transition = False
 
-                setattr(child, "introduction", self.trait + str(self.count))
-                child.annotations.add_bound_attribute("introduction")
+
+            else:
+                if child_state == self.to:
+                    if state != self.to:
+                        self.transition_points.append(child)
+                        self.count += 1
+                        self.found_transition = True
+                else:
+                    self.found_transition = False
+            if self.found_transition:
+                setattr(child, self.transition_name, self.transition_name + str(self.count))
+                child.annotations.add_bound_attribute(self.transition_name)
 
             self.traverse(child)
 
-    def split_at_transitions(self, tree):
-        self.annotate_transitions(tree)
+    def split_at_transitions(self, tree, From=None, to=None):
+        self.annotate_transitions(tree, From, to)
         trees = []
         for node in self.transition_points:
             new_root = node

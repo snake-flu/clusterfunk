@@ -1,16 +1,15 @@
-import dendropy
 import os
 from clusterfunk.label_transitions import *
-from clusterfunk.utils import check_str_for_bool
+from clusterfunk.utils import check_str_for_bool, prepare_tree
 
 
 def run(options):
-    tree = dendropy.Tree.get(path=options.input, schema="nexus", preserve_underscores=True)
-    annotator = TransitionAnnotator(check_str_for_bool(options.parent_state), check_str_for_bool(options.child_state),
-                                    options.trait, options.include_parent)
+    tree = prepare_tree(options)
+    annotator = TransitionAnnotator(options.trait, options.include_parent, options.transition_name)
 
     if options.exploded_trees:
-        trees = annotator.split_at_transitions(tree)
+        trees = annotator.split_at_transitions(tree, check_str_for_bool(options.parent_state),
+                                               check_str_for_bool(options.child_state))
         print(len(trees))
         if not os.path.exists(options.output):
             os.makedirs(options.output)
@@ -20,6 +19,7 @@ def run(options):
             i += 1
 
     else:
-        count = annotator.annotate_transitions(tree)
+        count = annotator.annotate_transitions(tree, check_str_for_bool(options.parent_state),
+                                               check_str_for_bool(options.child_state))
         print(count)
         tree.write(path=options.output, schema="nexus")

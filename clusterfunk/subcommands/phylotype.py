@@ -1,6 +1,8 @@
 from clusterfunk.phylotype import *
+from clusterfunk.utils import parse_tree, write_tree, prepare_tree
 
 
 def run(options):
-    phylotyper = Phylotyper(options.threshold, options.csv)
-    phylotyper.run(options.input, options.output)
+    tree = prepare_tree(options)
+    phylotype_tree(tree, options.threshold)
+    write_tree(tree, options.output, options.format)

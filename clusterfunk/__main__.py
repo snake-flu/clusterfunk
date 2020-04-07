@@ -13,6 +13,42 @@ def main(args=None):
     )
 
     parser.add_argument("--version", action="version", version=clusterfunk.__version__)
+
+    shared_arguments_parser = argparse.ArgumentParser(add_help=False)
+
+    shared_arguments_parser.add_argument(
+        "-i"
+        "--input",
+        metavar='input.tree',
+        dest="input",
+        type=str,
+        required=True,
+        help='The input tree file. Format can be specified with the format flag.')
+    shared_arguments_parser.add_argument(
+        "-o"
+        "--output",
+        metavar='output.*',
+        dest="output",
+        type=str,
+        required=True,
+        help='The output file')
+
+    shared_arguments_parser.add_argument(
+        '--format',
+        metavar="nexus, newick",
+        dest='format',
+        action='store',
+        default="nexus",
+        help='what format is the tree file. This is passed to dendropy. default is \'nexus\'')
+
+    shared_arguments_parser.add_argument(
+        "-c",
+        "--collapse_to_polytomies",
+        dest='collapse',
+        action='store_true',
+        default=False,
+        help='A boolean flag to collapse branches with length 0. Before running the rule.')
+
     subparsers = parser.add_subparsers(
         title="Available subcommands", help="", metavar=""
     )
@@ -21,21 +57,12 @@ def main(args=None):
     subparser_phylotype = subparsers.add_parser(
         "phylotype",
         aliases=['phylotype_dat_tree'],
-        usage="clusterfunk phylotype [--threshold] <input> <output> ",
+        usage="clusterfunk phylotype [--threshold] -i my.tree -o my.phylotyped.tree",
         help="Assigns phylotypes to a tree based on a branch length threshold",
+        parents=[shared_arguments_parser]
     )
 
-    subparser_phylotype.add_argument(
-        "input",
-        metavar='input',
-        type=str,
-        help='The input file currently must be a nexus')
 
-    subparser_phylotype.add_argument(
-        "output",
-        metavar='output',
-        type=str,
-        help='The output file currently must be a nexus')
     subparser_phylotype.add_argument(
         '-t',
         '--threshold',
@@ -45,38 +72,22 @@ def main(args=None):
         type=float,
         help='branch threshold used to distinguish new phylotype (default: 5E-6)')
 
-    subparser_phylotype.add_argument(
-        '-csv',
-        '--csv',
-        dest='csv',
-        action='store_true',
-        default=False,
-        help='Boolean flag, should the output be a csv of tips instead of an annotated tree file')
 
     subparser_phylotype.set_defaults(func=clusterfunk.subcommands.phylotype.run)
     # _____________________________ tree annotator ______________________________#
     subparser_annotate = subparsers.add_parser(
         "annotate_tree",
         aliases=['annotate_dat_tree'],
-        usage="clusterfunk annotate  <input> <output> ",
+        usage="clusterfunk annotate [--acctran/--deltran] [--ancestral_state UK] --traits country -i my.tree -o my.annotated.tree ",
         help="Annotates a tree. Can annotate tips from a csv, and/or annotate internal nodes from tips based on parsimony",
+        parents=[shared_arguments_parser]
     )
-
-    subparser_annotate.add_argument(
-        "input",
-        metavar='input',
-        type=str,
-        help='The input file currently must be a nexus')
-    subparser_annotate.add_argument(
-        "output",
-        metavar='output',
-        type=str,
-        help='The output file currently must be a nexus')
 
     subparser_annotate.add_argument(
         "-t",
         "--traits",
         metavar='traits',
+        required=True,
         type=str,
         nargs="+",
         help='Space separated list of traits to annotate on tree')
@@ -88,6 +99,22 @@ def main(args=None):
         action='store',
         type=str,
         help='optional csv file with tip annotations ')
+
+    subparser_annotate.add_argument(
+        '--indices',
+        dest='indices',
+        action='store',
+        type=int,
+        nargs="+",
+        help='optional indices for use in getting traits from tip labels')
+
+    subparser_annotate.add_argument(
+        "-s",
+        "--separator",
+        dest="separator",
+        type=str,
+        help="optional separator used to get trait"
+    )
 
     subparser_annotate.add_argument(
         '-acc',
@@ -117,26 +144,16 @@ def main(args=None):
     subparser_extract_tip_annotations = subparsers.add_parser(
         "extract_tip_annotations",
         aliases=['extract_dat_tree'],
-        usage="clusterfunk extract_annotations [--traits]  <input> <output> ",
+        usage="clusterfunk extract_annotations --traits country -i my.annotated.tree -o annotations.csv",
         help="extracts annotations from tips in a tree",
     )
 
-    subparser_extract_tip_annotations.add_argument(
-        "input",
-        metavar='input',
-        type=str,
-        help='The input file currently must be a nexus')
-
-    subparser_extract_tip_annotations.add_argument(
-        "output",
-        metavar='output',
-        type=str,
-        help='The output file currently must be a csv')
     subparser_extract_tip_annotations.add_argument(
         "-t",
         "--traits",
         metavar='traits',
         type=str,
+        required=True,
         nargs="+",
         help='Space separated list of traits to extract from tree')
 
@@ -146,21 +163,10 @@ def main(args=None):
     subparser_get_taxa = subparsers.add_parser(
         "get_taxa",
         aliases=['get_dat_taxa'],
-        usage="clusterfunk get_taxa  <input> <output> ",
+        usage="clusterfunk get_taxa  -i input.tree -o taxa.txt",
         help="extracts taxa labels from tips in a tree",
     )
 
-    subparser_get_taxa.add_argument(
-        "input",
-        metavar='input',
-        type=str,
-        help='The input file currently must be a nexus')
-
-    subparser_get_taxa.add_argument(
-        "output",
-        metavar='output',
-        type=str,
-        help='The output file is a text file')
     subparser_get_taxa.set_defaults(func=clusterfunk.subcommands.get_taxa.run)
 
     # _____________________________ label_transitions ______________________________#
@@ -168,42 +174,33 @@ def main(args=None):
     subparser_label_transitions = subparsers.add_parser(
         "label_transitions",
         aliases=['label_dat_transition'],
-        usage="clusterfunk label_transitions [--trait] [--parent] [--child] <input> <output>",
-        help="labels counts and labels transitions on a tree",
+        usage="clusterfunk label_transitions --trait UK --parent False --child True <input> <output>",
+        help="counts and labels transitions of binary traits on a tree",
     )
-
-    subparser_label_transitions.add_argument(
-        "input",
-        metavar='input',
-        type=str,
-        help='The input file currently must be a nexus')
-
-    subparser_label_transitions.add_argument(
-        "output",
-        metavar='output',
-        type=str,
-        help='The output file is a text file')
 
     subparser_label_transitions.add_argument(
         "-t",
         "--trait",
         metavar='trait',
         type=str,
-        help=' Trait key to extract from tree')
+        help=' Trait whose transitions are begin put on tree')
 
     subparser_label_transitions.add_argument(
-        "-p",
-        "--parent_state",
-        metavar='parent_state',
+        "--from",
+        dest='From',
         type=str,
-        help='parent state for transitions')
-
+        help='Label transitions from this state. Can be combined with to.')
     subparser_label_transitions.add_argument(
-        "-c",
-        "--child_state",
-        metavar='child_state',
+        "--to",
+        dest='to',
         type=str,
-        help='child state for transitions')
+        help='Label transitions to this state. Can be combined with from.')
+    subparser_label_transitions.add_argument(
+        "--transition_name",
+        dest='transition_name',
+        type=str,
+        help='The name of the annotation that will hold transitions. This also will form the base of the transition '
+             'label.')
 
     subparser_label_transitions.add_argument(
         "-e",
@@ -245,17 +242,6 @@ def main(args=None):
         type=str,
         help="optional separator used to get trait"
     )
-    subparser_subtyper.add_argument(
-        "input",
-        metavar='input',
-        type=str,
-        help='The input file currently must be a nexus')
-
-    subparser_subtyper.add_argument(
-        "output",
-        metavar='output',
-        type=str,
-        help='The output file is a text file')
 
     subparser_subtyper.add_argument(
         "-t",
@@ -264,13 +250,6 @@ def main(args=None):
         type=str,
         help='The tip label to get')
 
-    subparser_subtyper.add_argument(
-        "-dp",
-        "--deresolve_polytomies",
-        dest='collapse',
-        action='store_true',
-        default=False,
-        help='A boolean flag to collapse branches with length 0. This provides more resolution in assigning lineages')
 
     subparser_subtyper.set_defaults(func=clusterfunk.subcommands.subtyper.run)
 

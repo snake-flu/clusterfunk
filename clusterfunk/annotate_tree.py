@@ -14,7 +14,7 @@ class TreeAnnotator:
             trait[traitName] = tip.taxon.label.split(separator)[index]
             annotations[tip.taxon.label] = trait
 
-        self.annotate_tips(annotations);
+        self.annotate_tips(annotations)
 
     def annotate_tips(self, annotations):
         for tip in annotations:
@@ -93,13 +93,8 @@ class TreeAnnotator:
             self.reconstruct_ancestors(child, assigned_states, acctran, name)
 
 
-class AnnotationParser:
-    def __init__(self, taxon_key):
-        self.taxon_key = taxon_key
-        pass
-
-    def get_annotations(self, annotation_list):
-        annotation_dict = {}
-        for row in annotation_list:
-            annotation_dict[row[self.taxon_key]] = row
-        return annotation_dict
+def get_annotations(taxon_key, annotation_list):
+    annotation_dict = {}
+    for row in annotation_list:
+        annotation_dict[row[taxon_key]] = row
+    return annotation_dict

@@ -1,12 +1,11 @@
-import dendropy
 import csv
 from clusterfunk.extract_tip_annotations import *
+from clusterfunk.utils import prepare_tree
 
 
 def run(options):
-    tree = dendropy.Tree.get(path=options.input, schema="nexus", preserve_underscores=True)
-    annotation_extractor = AnnotationExtractor(tree)
-    annotations = annotation_extractor.get_annotations(options.traits)
+    tree = prepare_tree(options)
+    annotations = get_annotations(tree, options.traits)
 
     with open(options.output, "w") as csvfile:
         fileheader = ["taxon"] + options.traits
