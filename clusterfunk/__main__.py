@@ -17,7 +17,7 @@ def main(args=None):
     shared_arguments_parser = argparse.ArgumentParser(add_help=False)
 
     shared_arguments_parser.add_argument(
-        "-i"
+        "-i",
         "--input",
         metavar='input.tree',
         dest="input",
@@ -25,7 +25,7 @@ def main(args=None):
         required=True,
         help='The input tree file. Format can be specified with the format flag.')
     shared_arguments_parser.add_argument(
-        "-o"
+        "-o",
         "--output",
         metavar='output.*',
         dest="output",
