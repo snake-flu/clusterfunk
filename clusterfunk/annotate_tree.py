@@ -1,5 +1,7 @@
 from collections import Counter
 
+from clusterfunk.utils import check_str_for_bool
+
 
 class TreeAnnotator:
     def __init__(self, tree):
@@ -20,15 +22,15 @@ class TreeAnnotator:
         for tip in annotations:
             self.annotate_node(tip, annotations[tip])
 
-    def annotate_nodes_from_tips(self, name, acctran, parent_states=None):
-        if parent_states is None:
-            parent_states = []
+    def annotate_nodes_from_tips(self, name, acctran, parent_state=None):
+        if parent_state is None:
+            parent_state = []
         self.fitch_parsimony(self.root, name)
 
-        if parent_states is None:
+        if parent_state is None:
             self.reconstruct_ancestors(self.root, [], acctran, name)
         else:
-            self.reconstruct_ancestors(self.root, [parent_states], acctran, name)
+            self.reconstruct_ancestors(self.root, [parent_state], acctran, name)
 
     def annotate_node(self, tip_label, annotations):
         node = self.tree.find_node_with_taxon(lambda taxon: True if taxon.label == tip_label else False)
@@ -36,7 +38,7 @@ class TreeAnnotator:
             raise KeyError("Taxon %s not found in tree" % tip_label)
         for a in annotations:
             if a != "taxon":
-                setattr(node, a, annotations[a])
+                setattr(node, a, check_str_for_bool(annotations[a]))
                 node.annotations.add_bound_attribute(a)
 
     def fitch_parsimony(self, node, name):

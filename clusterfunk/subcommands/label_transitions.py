@@ -8,8 +8,8 @@ def run(options):
     annotator = TransitionAnnotator(options.trait, options.include_parent, options.transition_name)
 
     if options.exploded_trees:
-        trees = annotator.split_at_transitions(tree, check_str_for_bool(options.parent_state),
-                                               check_str_for_bool(options.child_state))
+        trees = annotator.split_at_transitions(tree, check_str_for_bool(options.From),
+                                               check_str_for_bool(options.to))
         print(len(trees))
         if not os.path.exists(options.output):
             os.makedirs(options.output)
@@ -19,7 +19,7 @@ def run(options):
             i += 1
 
     else:
-        count = annotator.annotate_transitions(tree, check_str_for_bool(options.parent_state),
-                                               check_str_for_bool(options.child_state))
+        count = annotator.annotate_transitions(tree, check_str_for_bool(options.From),
+                                               check_str_for_bool(options.to))
         print(count)
         tree.write(path=options.output, schema="nexus")

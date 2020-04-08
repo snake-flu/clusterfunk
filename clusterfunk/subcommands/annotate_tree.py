@@ -1,5 +1,4 @@
 from clusterfunk.annotate_tree import *
-import dendropy
 import csv
 
 from clusterfunk.utils import check_str_for_bool, prepare_tree
@@ -22,7 +21,7 @@ def run(options):
 
     if options.indices is not None and options.separator is not None:
         for i in range(0, len(options.traits)):
-            annotator.annotate_tips_from_label(options.traits[i], options.index[i], options.separator)
+            annotator.annotate_tips_from_label(options.traits[i], options.indices[i], options.separator)
 
     if options.acctran or options.deltran:
         acctran = True if options.acctran else False
@@ -32,6 +31,7 @@ def run(options):
             for annotation in options.traits:
                 ancestral_state = check_str_for_bool(options.ancestral_state[i]) if len(
                     options.ancestral_state) > i else None
+
                 annotator.annotate_nodes_from_tips(annotation, acctran, ancestral_state)
                 i += 1
 

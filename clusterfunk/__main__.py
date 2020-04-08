@@ -16,7 +16,7 @@ def main(args=None):
 
     shared_arguments_parser = argparse.ArgumentParser(add_help=False)
 
-    shared_required = shared_arguments_parser.add_argument_group("Required", required=True)
+    shared_required = shared_arguments_parser.add_argument_group("Required")
     shared_required.add_argument(
             "-i",
             "--input",
