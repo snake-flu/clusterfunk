@@ -17,6 +17,5 @@ def run(options):
         print("No taxa found in input files")
         return
 
-    tree = prune_tree(tree, taxa, options.extract)
-
-    tree.write(options.output, schema=options.format)
+    prune_tree(tree, taxa, options.extract)
+    tree.write(path=options.output, schema=options.format)

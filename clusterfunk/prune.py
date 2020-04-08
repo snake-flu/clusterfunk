@@ -27,6 +27,7 @@ def parse_taxon_set(file, schema, column=None):
 
 def prune_tree(tree, taxon_set, extract):
     if extract:
-        return tree.retain_taxa_with_labels(taxon_set)
+        tree.retain_taxa_with_labels(taxon_set)
     else:
-        return tree.prune_taxa_with_labels(taxon_set)
+        tree.prune_taxa_with_labels(taxon_set)
+    return tree

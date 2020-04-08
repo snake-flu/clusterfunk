@@ -27,27 +27,30 @@ class TransitionAnnotator:
         self.traverse(node)
         return self.count
 
-    def traverse(self, node):
+    def traverse(self, node, in_transition=False):
         state = node.annotations.get_value(self.trait)
-
+        found_transition = False
         for child in node.child_node_iter():
             child_state = child.annotations.get_value(self.trait)
 
             if self.From is not None:
+
                 if state == self.From:
-                    self.found_transition = False
+                    # potential for transition
+                    found_transition = False
                     if self.to is not None:
                         if child_state == self.to:
                             self.transition_points.append(child)
                             self.count += 1
-                            self.found_transition = True
+                            found_transition = True
                     else:
                         if child_state != state:
                             self.transition_points.append(child)
                             self.count += 1
-                            self.found_transition = True
+                            found_transition = True
                         else:
-                            self.found_transition = False
+                            found_transition = False
+                # el
 
 
             else:
@@ -55,12 +58,17 @@ class TransitionAnnotator:
                     if state != self.to:
                         self.transition_points.append(child)
                         self.count += 1
-                        self.found_transition = True
+                        found_transition = True
+
+                    setattr(child, self.transition_name, self.transition_name + str(self.count))
+                    child.annotations.add_bound_attribute(self.transition_name)
+
                 else:
-                    self.found_transition = False
-            if self.found_transition:
-                setattr(child, self.transition_name, self.transition_name + str(self.count))
-                child.annotations.add_bound_attribute(self.transition_name)
+                    found_transition = False
+
+                if child_state == self.to:
+                    setattr(child, self.transition_name, self.transition_name + str(self.count))
+                    child.annotations.add_bound_attribute(self.transition_name)
 
             self.traverse(child)
 

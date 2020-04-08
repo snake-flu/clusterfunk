@@ -268,8 +268,8 @@ def main(args=None):
 
     subparser_prune = subparsers.add_parser(
             "prune",
-            aliases=['subtype_dat_tree'],
-            usage="clusterfunk subtype --extract [--fasta file.fas] [--taxon taxon.set.txt] [--metadata metadata.csv/tsv --index-column taxon] -i my.tree -o my.smaller.tree ",
+            aliases=['prune_dat_tree'],
+            usage="clusterfunk prune --extract [--fasta file.fas] [--taxon taxon.set.txt] [--metadata metadata.csv/tsv --index-column taxon] -i my.tree -o my.smaller.tree ",
             help="Prunes a tree either removing the specified taxa or keeping only those specified. "
                  "Taxa can be specified from a fasta file, text file or metadata file with the taxon label indicated",
             parents=[shared_arguments_parser]
@@ -304,7 +304,7 @@ def main(args=None):
             help="incoming csv/tsv file defining taxon set."
     )
 
-    subparser_subtyper.set_defaults(func=clusterfunk.subcommands.prune.run)
+    subparser_prune.set_defaults(func=clusterfunk.subcommands.prune.run)
 
     args = parser.parse_args()
 
