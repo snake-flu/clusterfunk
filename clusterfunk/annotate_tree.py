@@ -13,7 +13,8 @@ class TreeAnnotator:
         annotations = {}
         for tip in self.tree.leaf_node_iter():
             trait = {}
-            trait[traitName] = tip.taxon.label.split(separator)[index]
+            value = tip.taxon.label.split(separator)[index]
+            trait[traitName] = value if len(value)>0 else None
             annotations[tip.taxon.label] = trait
 
         self.annotate_tips(annotations)
