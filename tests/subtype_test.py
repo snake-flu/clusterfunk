@@ -5,7 +5,7 @@ from clusterfunk.subtyper import Subtyper
 from clusterfunk.utils import collapse_nodes
 
 this_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-data_dir = os.path.join(this_dir, "tests", 'data')
+data_dir = os.path.join(this_dir, "tests", 'data', 'subtype')
 
 
 class MyTestCase(unittest.TestCase):
