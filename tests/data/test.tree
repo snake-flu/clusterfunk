@@ -1,4 +1,4 @@
 #NEXUS
 begin trees;
-	tree tree_1 = [&R] ((((((virus1||B1|country|admin1|admin0|date:0.1,virus2||B1|country|admin1|admin0|date:0.12):0.08,(virus3||B1|country|admin1|admin0|date:0.011,virus4||B1|country|admin1|admin0|date:0.0087):0.15):0.03,virus5||B1|country|admin1|admin0|date:0.21):0.2,(virus6||B1|country|admin1|admin0|date:0.45,virus7||B1|country|admin1|admin0|date:0.4):0.02):0.1,virus8||B1|country|admin1|admin0|date:0.4):0.1,(virus9||B1|country|admin1|admin0|date:0.04,virus10||B1|country|admin1|admin0|date:0.03):0.6);
+	tree tree_1 = [&R] ((((((virus1||B.1|country|admin1|admin0|date:0.1,virus2||B.1|country|admin1|admin0|date:0.12):0.08,(virus3||B.1|country|admin1|admin0|date:0.011,virus4||B.1|country|admin1|admin0|date:0.0087):0.15):0.03,virus5||B.1|country|admin1|admin0|date:0.21):0.2,(virus6||B.1|country|admin1|admin0|date:0.45,virus7||B.1|country|admin1|admin0|date:0.4):0.02):0.1,virus8||B.1|country|admin1|admin0|date:0.4):0.1,(virus9||B.1|country|admin1|admin0|date:0.04,virus10||B.1|country|admin1|admin0|date:0.03):0.6);
 end;

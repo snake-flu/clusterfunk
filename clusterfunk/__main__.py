@@ -7,39 +7,40 @@ import clusterfunk.subcommands
 
 def main(args=None):
     parser = argparse.ArgumentParser(
-        prog="clusterfunk",
-        usage="clusterfunk <subcommand> <options>",
-        description="Miscellaneous clustering tools",
+            prog="clusterfunk",
+            usage="clusterfunk <subcommand> <options>",
+            description="Miscellaneous clustering tools",
     )
 
     parser.add_argument("--version", action="version", version=clusterfunk.__version__)
 
     shared_arguments_parser = argparse.ArgumentParser(add_help=False)
 
-    shared_arguments_parser.add_argument(
-        "-i",
-        "--input",
-        metavar='input.tree',
-        dest="input",
-        type=str,
-        required=True,
-        help='The input tree file. Format can be specified with the format flag.')
-    shared_arguments_parser.add_argument(
-        "-o",
-        "--output",
-        metavar='output.*',
-        dest="output",
-        type=str,
-        required=True,
-        help='The output file')
+    shared_required = shared_arguments_parser.add_argument_group("Required", required=True)
+    shared_required.add_argument(
+            "-i",
+            "--input",
+            metavar='input.tree',
+            dest="input",
+            type=str,
+            required=True,
+            help='The input tree file. Format can be specified with the format flag.')
+    shared_required.add_argument(
+            "-o",
+            "--output",
+            metavar='output.*',
+            dest="output",
+            type=str,
+            required=True,
+            help='The output file')
 
     shared_arguments_parser.add_argument(
-        '--format',
-        metavar="nexus, newick",
-        dest='format',
-        action='store',
-        default="nexus",
-        help='what format is the tree file. This is passed to dendropy. default is \'nexus\'')
+            '--format',
+            dest='format',
+            action='store',
+            default="nexus",
+            choices=['nexus', 'newick', 'nexml'],
+            help='what format is the tree file. This is passed to dendropy. default is \'nexus\'')
 
     shared_arguments_parser.add_argument(
         "-c",
@@ -235,7 +236,6 @@ def main(args=None):
         usage="clusterfunk subtype --separator \"|\" --index 2 --taxon my|fav|taxon -i my.tree -o my.csv ",
         help="Annotates a specified tip with a specified trait ",
         parents=[shared_arguments_parser]
-
     )
     subparser_subtyper.add_argument(
         "--index",
@@ -255,15 +255,56 @@ def main(args=None):
     )
 
     subparser_subtyper.add_argument(
-        "-t",
-        "--taxon",
-        dest='taxon',
-        type=str,
-        required=True,
-        help='The tip label to get')
-
+            "-t",
+            "--taxon",
+            dest='taxon',
+            type=str,
+            required=True,
+            help='The tip label to get')
 
     subparser_subtyper.set_defaults(func=clusterfunk.subcommands.subtyper.run)
+
+    # _____________________________ prune ______________________________#
+
+    subparser_prune = subparsers.add_parser(
+            "prune",
+            aliases=['subtype_dat_tree'],
+            usage="clusterfunk subtype --extract [--fasta file.fas] [--taxon taxon.set.txt] [--metadata metadata.csv/tsv --index-column taxon] -i my.tree -o my.smaller.tree ",
+            help="Prunes a tree either removing the specified taxa or keeping only those specified. "
+                 "Taxa can be specified from a fasta file, text file or metadata file with the taxon label indicated",
+            parents=[shared_arguments_parser]
+    )
+
+    subparser_prune.add_argument(
+            "--extract",
+            action="store_true",
+            dest="extract",
+            default=False,
+            help="Boolean flag to extract and return the subtree defined by the taxa"
+    )
+
+    subparser_prune.add_argument(
+            "--index-column",
+            dest="index",
+            help="column of metadata that holds the taxon names"
+    )
+
+    taxon_set_files = subparser_prune.add_mutually_exclusive_group(required=True)
+
+    taxon_set_files.add_argument(
+            "--fasta",
+            help="incoming fasta file defining taxon set"
+    )
+    taxon_set_files.add_argument(
+            "--taxon",
+            help="incoming text file defining taxon set with a new taxon on each line"
+    )
+    taxon_set_files.add_argument(
+            "--metadata",
+            help="incoming csv/tsv file defining taxon set."
+    )
+
+    subparser_subtyper.set_defaults(func=clusterfunk.subcommands.prune.run)
 
     args = parser.parse_args()
 

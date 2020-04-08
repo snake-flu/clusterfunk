@@ -1,3 +1,4 @@
-__all__ = ["phylotype", "annotate_tree", "extract_tip_annotations", "get_taxa", "label_transitions", "subtyper"]
+__all__ = ["phylotype", "annotate_tree", "extract_tip_annotations", "get_taxa", "label_transitions", "subtyper",
+           "prune"]
 
 from clusterfunk.subcommands import *

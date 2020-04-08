@@ -1,0 +1,4 @@
+virus1||B.1|country|admin1|admin0|date
+virus3||B.1|country|admin1|admin0|date
+virus5||B.1|country|admin1|admin0|date
+virus10||B.1|country|admin1|admin0|date

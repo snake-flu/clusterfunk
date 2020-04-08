@@ -5,6 +5,6 @@ try:
 except:
     __version__ = "local"
 
-__all__ = ["phylotype", "annotate_tree", "extract_tip_annotations", "label_transitions", "subtyper"]
+__all__ = ["phylotype", "annotate_tree", "extract_tip_annotations", "label_transitions", "subtyper", "prune"]
 
 from clusterfunk import *
