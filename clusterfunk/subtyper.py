@@ -37,7 +37,9 @@ class Subtyper:
             traits = list(set([tip.annotations.get_value(self.traitName) for tip in sibling_tips]))
             return traits[0]
 
-        # If this is in a polytomy then we can impute the parent state and assign it here.
+        # If this is in a polytomy then we can impute the parent state and assign it here. so long as there are multiple
+        # TODO check siblings with lineages assigned.
+        # sibling lineages with assigned lineages will always be == number of siblings in guide tree
 
         # If there aren't any sibling tips then we have to traverse the cousins to get the traits down those lines
         parent_or_gran = tip.parent_node if len(sibling_nodes) > 1 else tip.parent_node.parent_node
