@@ -30,9 +30,17 @@ def run(options):
             i = 0
             for annotation in options.traits:
                 ancestral_state = check_str_for_bool(options.ancestral_state[i]) if len(
-                    options.ancestral_state) > i else None
+                        options.ancestral_state) > i else None
 
                 annotator.annotate_nodes_from_tips(annotation, acctran, ancestral_state)
                 i += 1
+    if options.mrca is not None:
+        for trait_name in options.mrca:
+            #         get values ofr traits
+            values = list(set([node.annotations.get_value(trait_name) for node in
+                               tree.leaf_node_iter(lambda tip: tip.annotations.get_value(trait_name) is not None)]))
 
-    tree.write(path=options.output, schema=options.format)
+            for value in values:
+                annotator.annotate_mrca(trait_name, value)
+
+    tree.write(path=options.output, schema="nexus")

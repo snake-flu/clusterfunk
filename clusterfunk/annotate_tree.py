@@ -5,9 +5,10 @@ from clusterfunk.utils import check_str_for_bool
 
 
 class TreeAnnotator:
-    def __init__(self, tree):
+    def __init__(self, tree, majority_rule=False):
         self.tree = tree
         self.root = tree.seed_node
+        self.majority_rule = majority_rule
         pass
 
     def annotate_tips_from_label(self, traitName, index, separator):
@@ -15,7 +16,7 @@ class TreeAnnotator:
         for tip in self.tree.leaf_node_iter():
             trait = {}
             value = tip.taxon.label.split(separator)[index]
-            trait[traitName] = value if len(value)>0 else None
+            trait[traitName] = value if len(value) > 0 else None
             annotations[tip.taxon.label] = trait
 
         self.annotate_tips(annotations)
@@ -44,6 +45,14 @@ class TreeAnnotator:
                     setattr(node, a, check_str_for_bool(annotations[a]))
                     node.annotations.add_bound_attribute(a)
 
+    def annotate_mrca(self, trait_name, value):
+        taxon_set = [tip.taxon for tip in
+                     self.tree.leaf_node_iter(lambda node: node.annotations.get_value(trait_name) == value)]
+        mrca = self.tree.mrca(taxa=taxon_set)
+
+        setattr(mrca, "%s-mrca" % trait_name, value)
+        mrca.annotations.add_bound_attribute("%s-mrca" % trait_name)
+
     def fitch_parsimony(self, node, name):
         if len(node.child_nodes()) == 0:
             tip_annotation = node.annotations.get_value(name) if node.annotations.get_value(name) is not None else []
@@ -51,15 +60,27 @@ class TreeAnnotator:
 
         union = set()
         intersection = set()
+        all_states = []
 
         i = 0
         for child in node.child_node_iter():
             child_states = self.fitch_parsimony(child, name)
             union = union.union(child_states)
             intersection = set(child_states) if i == 0 else intersection.intersection(child_states)
+            all_states.extend(child_states)
             i += 1
 
         value = list(intersection) if len(intersection) > 0 else list(union)
+
+        if self.majority_rule and len(intersection) == 0:
+            if node.num_child_nodes() > 2:
+                unique_states = list(union)
+                state_counts = [0 for state in unique_states]
+                for child_state in all_states:
+                    state_counts[unique_states.index(child_state)] += 1
+                max_count = max(state_counts)
+                value = [state for state in unique_states if state_counts[unique_states.index(state)] == max_count]
+
         setattr(node, name, value[0] if len(value) == 1 else value)
 
         node.annotations.add_bound_attribute(name)
@@ -68,13 +89,13 @@ class TreeAnnotator:
 
     def reconstruct_ancestors(self, node, parent_states, acctran, name):
         node_states = node.annotations.get_value(name) if isinstance(node.annotations.get_value(name), list) else [
-            node.annotations.get_value(name)]
+                node.annotations.get_value(name)]
 
         if node.taxon is not None and len(node_states) == 1 and node_states[0] is not None:
             assigned_states = node_states
         else:
             assigned_states = list(set(node_states).intersection(parent_states)) if len(
-                set(node_states).intersection(parent_states)) > 0 else list(set(node_states).union(parent_states))
+                    set(node_states).intersection(parent_states)) > 0 else list(set(node_states).union(parent_states))
 
         if len(assigned_states) > 1:
             if acctran:
@@ -85,12 +106,12 @@ class TreeAnnotator:
                 for child in node.child_node_iter():
                     child_states += child.annotations.get_value(name) if isinstance(child.annotations.get_value(name),
                                                                                     list) else [
-                        child.annotations.get_value(name)]
+                            child.annotations.get_value(name)]
 
                 assigned_states = [state for state in assigned_states if
                                    state in parent_states and state in child_states] if len(
-                    set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
-                                                                             state in child_states]
+                        set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
+                                                                                 state in child_states]
 
         setattr(node, name, assigned_states[0] if len(assigned_states) == 1 else assigned_states)
 
