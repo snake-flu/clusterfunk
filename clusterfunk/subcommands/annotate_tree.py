@@ -11,7 +11,7 @@ def run(options):
         raise ValueError("Can annotate from a file and tip labels at the same time. Run as two separate steps")
 
     tree = prepare_tree(options)
-    annotator = TreeAnnotator(tree)
+    annotator = TreeAnnotator(tree, options.majority_rule)
 
     if options.traits_file is not None:
         with open(options.traits_file, newline='') as csvfile:
@@ -22,6 +22,13 @@ def run(options):
     if options.indices is not None and options.separator is not None:
         for i in range(0, len(options.traits)):
             annotator.annotate_tips_from_label(options.traits[i], options.indices[i], options.separator)
+
+    if options.values is not None:
+        i = 0
+        for trait in options.traits:
+            value = options.values[i]
+            annotator.add_boolean_trait(trait, value)
+            i += 1
 
     if options.acctran or options.deltran:
         acctran = True if options.acctran else False

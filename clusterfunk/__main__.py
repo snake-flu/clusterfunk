@@ -46,9 +46,8 @@ def main(args=None):
             "-c",
             "--collapse_to_polytomies",
             dest='collapse',
-            action='store_true',
-            default=False,
-            help='A boolean flag to collapse branches with length 0. Before running the rule.')
+            type=float,
+            help='A optional flag to collapse branches with length < the input before running the rule.')
 
     subparsers = parser.add_subparsers(
             title="Available subcommands", help="", metavar=""
@@ -146,7 +145,6 @@ def main(args=None):
     )
     subparser_annotate.add_argument(
             '--majority_rule',
-            '--mrca',
             action='store_true',
             default=False,
             help="A Boolean flag. In trait reconstruction, at a polytomy, when there is no intersection of traits from all children"
@@ -154,7 +152,51 @@ def main(args=None):
                  "be assigned. Default:False - the union of traits are assigned"
     )
 
+    subparser_annotate.add_argument(
+            '--values',
+            nargs="+",
+            help="A list of values supporting the boolean traits."
+    )
+
     subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tree.run)
+
+    # _____________________________ re annotator ______________________________#
+    subparser_reannotate = subparsers.add_parser(
+            "reannotate_tree",
+            aliases=['annotate_dat_tree_again'],
+            usage="clusterfunk reannotate  --traits country -i my.tree -o my.annotated.tree ",
+            help="ReAnnotates a tree. It assigns a traits from a csv to tips. then grabs the mrca of those tips and"
+                 " pushes the annotation up to any new tip",
+            parents=[shared_arguments_parser]
+    )
+
+    subparser_reannotate.add_argument(
+            "-t",
+            "--traits",
+            metavar='traits',
+            required=True,
+            type=str,
+            nargs="+",
+            help='Space separated list of traits to annotate on tree')
+
+    subparser_reannotate.add_argument(
+            '-tf',
+            '--traits_file',
+            dest='traits_file',
+            action='store',
+            type=str,
+            help='optional csv file with tip annotations assumes taxon is the key column.')
+
+    subparser_reannotate.add_argument(
+            '-f',
+            '--filter',
+            dest='filter',
+            metavar="<key>=<value>",
+            type=str,
+            nargs="+",
+            help='optional filters for which tips should get annotation.')
+
+    subparser_reannotate.set_defaults(func=clusterfunk.subcommands.reannotate_tree.run)
 
     # _____________________________ extract_tip_annotations ______________________________#
     subparser_extract_tip_annotations = subparsers.add_parser(

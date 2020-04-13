@@ -4,6 +4,35 @@ from collections import Counter
 from clusterfunk.utils import check_str_for_bool
 
 
+def push_trait_to_tips(node, trait_name, value, predicate=lambda x: True):
+    def action(n):
+        if n.is_leaf():
+            setattr(n, trait_name, value)
+            n.annotations.add_bound_attribute(trait_name)
+
+    traverse_and_annotate = TraversalAction(predicate, action)
+    traverse_and_annotate.run(node)
+
+
+def traverse(node, predicate, action):
+    for child in node.child_node_iter():
+        if predicate(child):
+            action(child)
+            traverse(node, predicate, action)
+
+
+class TraversalAction:
+    def __init__(self, predicate, action):
+        self.predicate = predicate
+        self.action = action
+
+    def run(self, node):
+        for child in node.child_node_iter():
+            if self.predicate(child):
+                self.action(child)
+                self.run(node)
+
+
 class TreeAnnotator:
     def __init__(self, tree, majority_rule=False):
         self.tree = tree
@@ -21,9 +50,22 @@ class TreeAnnotator:
 
         self.annotate_tips(annotations)
 
+    def add_boolean_trait(self, trait, value):
+        for node in self.tree.postorder_node_iter():
+            self.add_boolean(node, trait, value)
+
     def annotate_tips(self, annotations):
         for tip in annotations:
             self.annotate_node(tip, annotations[tip])
+
+    def add_boolean(self, node, trait, value):
+        boolean_trait_name = "%s_%s" % (trait, str(value))
+        if node.annotations.get_value(trait) is not None:
+            if node.annotations.get_value(trait) == value:
+                setattr(node, boolean_trait_name, True)
+            else:
+                setattr(node, boolean_trait_name, False)
+            node.annotations.add_bound_attribute(boolean_trait_name)
 
     def annotate_nodes_from_tips(self, name, acctran, parent_state=None):
         if parent_state is None:
@@ -52,6 +94,7 @@ class TreeAnnotator:
 
         setattr(mrca, "%s-mrca" % trait_name, value)
         mrca.annotations.add_bound_attribute("%s-mrca" % trait_name)
+        return mrca
 
     def fitch_parsimony(self, node, name):
         if len(node.child_nodes()) == 0:
@@ -78,8 +121,13 @@ class TreeAnnotator:
                 state_counts = [0 for state in unique_states]
                 for child_state in all_states:
                     state_counts[unique_states.index(child_state)] += 1
-                max_count = max(state_counts)
-                value = [state for state in unique_states if state_counts[unique_states.index(state)] == max_count]
+                cutoff = node.num_child_nodes() / 2
+                majority = [state for state in unique_states if state_counts[unique_states.index(state)] > cutoff]
+                value = majority if len(majority) > 0 else value
+                setattr(node, "children_" + name, unique_states)
+                setattr(node, "children_" + name + "_counts", state_counts)
+                node.annotations.add_bound_attribute("children_" + name)
+                node.annotations.add_bound_attribute("children_" + name + "_counts")
 
         setattr(node, name, value[0] if len(value) == 1 else value)
 
@@ -91,7 +139,7 @@ class TreeAnnotator:
         node_states = node.annotations.get_value(name) if isinstance(node.annotations.get_value(name), list) else [
                 node.annotations.get_value(name)]
 
-        if node.taxon is not None and len(node_states) == 1 and node_states[0] is not None:
+        if node.is_leaf() and len(node_states) == 1 and node_states[0] is not None:
             assigned_states = node_states
         else:
             assigned_states = list(set(node_states).intersection(parent_states)) if len(

@@ -29,5 +29,5 @@ def collapse_nodes(tree, predicate):
 def prepare_tree(options):
     tree = parse_tree(options.input, options.format)
     if options.collapse:
-        collapse_nodes(tree, lambda node: node.edge.length == 0)
+        collapse_nodes(tree, lambda node: node.edge.length < options.collapse)
     return tree
