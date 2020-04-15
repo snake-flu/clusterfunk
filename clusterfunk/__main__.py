@@ -57,7 +57,7 @@ def main(args=None):
     subparser_phylotype = subparsers.add_parser(
             "phylotype",
             aliases=['phylotype_dat_tree'],
-            usage="clusterfunk phylotype [--threshold] -i my.tree -o my.phylotyped.tree",
+            usage="clusterfunk phylotype [--threshold] [---suffix] --inputmy.tree --output my.phylotyped.tree",
             help="Assigns phylotypes to a tree based on a branch length threshold",
             parents=[shared_arguments_parser]
     )
@@ -84,7 +84,7 @@ def main(args=None):
     subparser_annotate = subparsers.add_parser(
             "annotate_tree",
             aliases=['annotate_dat_tree'],
-            usage="clusterfunk annotate [--acctran/--deltran] [--ancestral_state UK] --traits country -i my.tree -o my.annotated.tree ",
+            usage="clusterfunk annotate [--acctran/--deltran] [--ancestral_state UK] --traits country --input my.tree --output my.annotated.tree ",
             help="Annotates a tree. Can annotate tips from a csv, and/or annotate internal nodes from tips based on parsimony",
             parents=[shared_arguments_parser]
     )
@@ -99,49 +99,11 @@ def main(args=None):
             help='Space separated list of traits to annotate on tree')
 
     subparser_annotate.add_argument(
-            '--in-metadata',
-            dest='traits_file',
-            action='store',
-            type=str,
-            help='optional csv file with tip annotations ')
-
-    subparser_annotate.add_argument(
-            '--indices',
-            dest='indices',
-            action='store',
-            type=int,
+            '--boolean-values',
+            dest="values",
             nargs="+",
-            help='optional indices for use in getting traits from tip labels')
-
-    subparser_annotate.add_argument(
-            "-s",
-            "--separator",
-            dest="separator",
-            type=str,
-            help="optional separator used to split taxon label"
-    )
-
-    subparser_annotate.add_argument(
-            '-acc',
-            '--acctran',
-            dest='acctran',
-            action='store_true',
-            help="Boolean flag to use acctran reconstruction")
-
-    subparser_annotate.add_argument(
-            '-del',
-            '--deltran',
-            dest='deltran',
-            action='store_true',
-            help="Boolean flag to use deltran reconstruction")
-
-    subparser_annotate.add_argument(
-            '-a',
-            '--ancestral_state',
-            metavar='ancestral_state',
-            action='store',
-            nargs="+",
-            help="Option to Set the ancestral state for the tree. In same order of traits")
+            help="A list of values in order of the traits listed. A boolean annotation will be added for each node"
+                 "with the trait sepecifying whether or not it equals this value")
 
     subparser_annotate.add_argument(
             '-mrca',
@@ -150,7 +112,57 @@ def main(args=None):
             help="An optional list of traits for which the mrca of each value in each trait"
                  "will be annotated with '[trait_name]-mrca and assigned that value"
     )
-    subparser_annotate.add_argument(
+
+    from_tip_group = subparser_annotate.add_argument_group("Annotating from taxon labels")
+    from_meta_data = subparser_annotate.add_argument_group("Annotation from metadata file")
+
+    from_tip_group.add_argument(
+            "--from-tip-labels",
+            action="store_true",
+            dest="from_tip_labels",
+            help="Boolean flag signifying traits will come from tip labels",
+            default=False
+    )
+
+    from_tip_group.add_argument(
+            '--indices',
+            dest='indices',
+            action='store',
+            type=int,
+            nargs="+",
+            help='optional indices for use in getting traits from tip labels')
+
+    from_tip_group.add_argument(
+            "-s",
+            "--separator",
+            dest="separator",
+            type=str,
+            help="optional separator used to split taxon label"
+    )
+
+    ancestral_reconstruction = subparser_annotate.add_argument_group("Ancestral reconstruction")
+
+    ancestral_reconstruction.add_argument(
+            '-acc',
+            '--acctran',
+            dest='acctran',
+            action='store_true',
+            help="Boolean flag to use acctran reconstruction")
+
+    ancestral_reconstruction.add_argument(
+            '-del',
+            '--deltran',
+            dest='deltran',
+            action='store_true',
+            help="Boolean flag to use deltran reconstruction")
+
+    ancestral_reconstruction.add_argument(
+            '--ancestral_state',
+            metavar='ancestral_state',
+            action='store',
+            nargs="+",
+            help="Option to Set the ancestral state for the tree. In same order of traits")
+    ancestral_reconstruction.add_argument(
             '--majority_rule',
             action='store_true',
             default=False,
@@ -158,31 +170,33 @@ def main(args=None):
                  "should the trait that appears most in the children"
                  "be assigned. Default:False - the union of traits are assigned"
     )
-    subparser_annotate.add_argument(
+
+    from_meta_data.add_argument(
+            '--in-metadata',
+            dest='traits_file',
+            action='store',
+            type=str,
+            help='optional csv file with tip annotations ')
+
+    from_meta_data.add_argument(
             '--index-column',
             dest="index_column",
             default="taxon",
             help="What column in the csv should be used to match the tip names."
     )
 
-    subparser_annotate.add_argument(
+    from_meta_data.add_argument(
             '--taxon-key-index',
             dest="taxon_key_index",
             type=int,
             help="After spliting taxon names at separator which entry matches the metadata index column entry."
     )
-
-    subparser_annotate.add_argument(
-            "--from-tip-labels",
-            action="store_true",
-            dest="from_tip_labels",
-            default=False
-    )
-
-    subparser_annotate.add_argument(
-            '--values',
-            nargs="+",
-            help="A list of values supporting the boolean traits."
+    from_meta_data.add_argument(
+            "--taxon-separator",
+            dest="taxon_separator",
+            type=str,
+            help="optional separator used to split taxon label. To be used if only part of a taxon name is to be matched"
+                 "in the metatdata file"
     )
 
     subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tree.run)
@@ -241,7 +255,7 @@ def main(args=None):
             type=str,
             required=True,
             nargs="+",
-            help='Space separated list of traits to extract from tree')
+            help='Space separated list of traits to extract from tips')
 
     subparser_extract_tip_annotations.set_defaults(func=clusterfunk.subcommands.extract_tip_annotations.run)
     # _____________________________ get_taxa ______________________________#
@@ -291,13 +305,11 @@ def main(args=None):
             dest='transition_name',
             type=str,
             required=True,
-            help='The name of the annotation that will hold transitions. This also will form the base of the transition '
-                 'label.')
+            help='The name of the annotation that will hold transitions.')
     subparser_label_transitions.add_argument(
-            '-ts',
             '--transition_suffix',
             type=str,
-            help='suffix for each transition'
+            help='suffix for each transition value'
     )
     subparser_label_transitions.add_argument(
             "-e",
@@ -308,7 +320,6 @@ def main(args=None):
             help='A boolean flag to output a nexus for each transition. In this case the ouput argument is treated as a directory and made if it doesn\'t exist')
 
     subparser_label_transitions.add_argument(
-            "-ip",
             "--include_parent",
             dest='include_parent',
             action='store_true',
@@ -327,21 +338,6 @@ def main(args=None):
                  "Taxa can be specified from a fasta file, text file or metadata file with the taxon label indicated",
             parents=[shared_arguments_parser]
     )
-
-    subparser_prune.add_argument(
-            "--extract",
-            action="store_true",
-            dest="extract",
-            default=False,
-            help="Boolean flag to extract and return the subtree defined by the taxa"
-    )
-
-    subparser_prune.add_argument(
-            "--index-column",
-            dest="index",
-            help="column of metadata that holds the taxon names"
-    )
-
     taxon_set_files = subparser_prune.add_mutually_exclusive_group(required=True)
 
     taxon_set_files.add_argument(
@@ -355,6 +351,27 @@ def main(args=None):
     taxon_set_files.add_argument(
             "--metadata",
             help="incoming csv/tsv file defining taxon set."
+    )
+
+    meta_data_options = subparser_prune.add_mutually_exclusive_group()
+
+    meta_data_options.add_argument(
+            "--index-column",
+            dest="index",
+            help="column of metadata that holds the taxon names"
+    )
+    meta_data_options.add_argument(
+            "--trait-column",
+            dest="traits",
+            help="column of metadata that holds the discrete trait. A tree will be output in the output directory for each"
+                 "value in this trait"
+    )
+    subparser_prune.add_argument(
+            "--extract",
+            action="store_true",
+            dest="extract",
+            default=False,
+            help="Boolean flag to extract and return the subtree defined by the taxa"
     )
 
     subparser_prune.set_defaults(func=clusterfunk.subcommands.prune.run)

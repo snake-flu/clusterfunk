@@ -17,7 +17,7 @@ def run(options):
         with open(options.traits_file, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             annotations = get_annotations(options.index_column, reader, options.traits)
-        annotator.annotate_tips(annotations, options.taxon_key_index, options.separator)
+        annotator.annotate_tips(annotations, options.taxon_key_index, options.taxon_separator)
 
     if options.from_tip_labels:
         for i in range(0, len(options.traits)):

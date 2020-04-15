@@ -11,7 +11,7 @@ def run(options):
     elif options.taxon is not None:
         taxa = parse_taxon_set(options.taxon, "txt")
     elif options.metadata is not None:
-        taxa = parse_taxon_set(options.metadata, "metadat", options.index)
+        taxa = parse_taxon_set(options.metadata, "metadata", options.index)
 
     if len(taxa) == 0:
         print("No taxa found in input files")
