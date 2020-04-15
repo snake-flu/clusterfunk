@@ -14,8 +14,10 @@ def run(options):
     annotator = TreeAnnotator(tree, options.majority_rule)
 
     if options.traits_file is not None:
-        with open(options.traits_file, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
+        with open(options.traits_file, newline='') as metadata:
+            dialect = csv.Sniffer().sniff(metadata.read(1024))
+            metadata.seek(0)
+            reader = csv.DictReader(metadata, dialect=dialect)
             annotations = get_annotations(options.index_column, reader, options.traits)
         annotator.annotate_tips(annotations, options.taxon_key_index, options.taxon_separator)
 
