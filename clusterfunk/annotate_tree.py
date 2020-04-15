@@ -14,13 +14,6 @@ def push_trait_to_tips(node, trait_name, value, predicate=lambda x: True):
     traverse_and_annotate.run(node)
 
 
-def traverse(node, predicate, action):
-    for child in node.child_node_iter():
-        if predicate(child):
-            action(child)
-            traverse(node, predicate, action)
-
-
 class TraversalAction:
     def __init__(self, predicate, action):
         self.predicate = predicate
@@ -38,6 +31,7 @@ class TreeAnnotator:
         self.tree = tree
         self.root = tree.seed_node
         self.majority_rule = majority_rule
+        self.taxon_parser = lambda x: x
         pass
 
     def annotate_tips_from_label(self, traitName, index, separator):
@@ -54,9 +48,12 @@ class TreeAnnotator:
         for node in self.tree.postorder_node_iter():
             self.add_boolean(node, trait, value)
 
-    def annotate_tips(self, annotations):
-        for tip in annotations:
-            self.annotate_node(tip, annotations[tip])
+    def annotate_tips(self, annotations, index=None, separator=None):
+        if index is not None and separator is not None:
+            self.taxon_parser = lambda x: x.split(separator)[index]
+        for tip_label in annotations:
+            self.annotate_node(tip_label, annotations[tip_label])
+        self.taxon_parser = lambda x: x
 
     def add_boolean(self, node, trait, value):
         boolean_trait_name = "%s_%s" % (trait, str(value))
@@ -78,12 +75,14 @@ class TreeAnnotator:
             self.reconstruct_ancestors(self.root, [parent_state], acctran, name)
 
     def annotate_node(self, tip_label, annotations):
-        node = self.tree.find_node_with_taxon(lambda taxon: True if taxon.label == tip_label else False)
+
+        node = self.tree.find_node_with_taxon(
+            lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
         if node is None:
             warnings.warn("Taxon: %s not found in tree" % tip_label)
         else:
             for a in annotations:
-                if a != "taxon":
+                if len(annotations[a]) > 0:
                     setattr(node, a, check_str_for_bool(annotations[a]))
                     node.annotations.add_bound_attribute(a)
 
@@ -167,8 +166,12 @@ class TreeAnnotator:
             self.reconstruct_ancestors(child, assigned_states, acctran, name)
 
 
-def get_annotations(taxon_key, annotation_list):
+def get_annotations(taxon_key, annotation_list, traits):
     annotation_dict = {}
     for row in annotation_list:
-        annotation_dict[row[taxon_key]] = row
+        print(row)
+        annotations = {}
+        for trait in traits:
+            annotations[trait] = row[trait]
+        annotation_dict[row[taxon_key]] = annotations
     return annotation_dict

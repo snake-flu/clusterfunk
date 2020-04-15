@@ -2,7 +2,7 @@ import dendropy
 import csv
 
 
-def phylotype_tree(tree, threshold=5e-6):
+def phylotype_tree(tree, threshold=5e-6, suffix="p"):
     def phylotype_nodes(node, phylotype="p"):
         node.phylotype = "\"" + phylotype + "\""
         node.annotations.add_bound_attribute("phylotype")
@@ -15,4 +15,4 @@ def phylotype_tree(tree, threshold=5e-6):
                     i += 1
             phylotype_nodes(child, phylotype + suffix)
 
-    phylotype_nodes(tree.seed_node)
+    phylotype_nodes(tree.seed_node, suffix)

@@ -2,7 +2,7 @@ import dendropy
 
 
 class TransitionAnnotator:
-    def __init__(self, trait, include_parent, transition_name):
+    def __init__(self, trait, include_parent, transition_name, transition_suffix):
 
         self.trait = trait
         self.From = None
@@ -10,7 +10,8 @@ class TransitionAnnotator:
         self.count = 0
         self.transition_points = []
         self.include_parent = include_parent
-        self.found_transition = False;
+        self.found_transition = False
+        self.transition_suffix = transition_suffix
 
         self.transition_name = transition_name
 
@@ -38,12 +39,12 @@ class TransitionAnnotator:
                         if node_state == self.to:
                             self.transition_points.append(node)
                             self.count += 1
-                            setattr(node, self.transition_name, self.transition_name + str(self.count))
+                            setattr(node, self.transition_name, self.transition_suffix + str(self.count))
                             node.annotations.add_bound_attribute(self.transition_name)
                     elif node_state != parent_state:
                         self.transition_points.append(node)
                         self.count += 1
-                        setattr(node, self.transition_name, self.transition_name + str(self.count))
+                        setattr(node, self.transition_name, self.transition_suffix + str(self.count))
                         node.annotations.add_bound_attribute(self.transition_name)
                 else:
                     if node_state != self.From:
@@ -61,7 +62,7 @@ class TransitionAnnotator:
                     else:
                         self.transition_points.append(node)
                         self.count += 1
-                        setattr(node, self.transition_name, self.transition_name + str(self.count))
+                        setattr(node, self.transition_name, self.transition_suffix + str(self.count))
                         node.annotations.add_bound_attribute(self.transition_name)
         for child in node.child_node_iter():
             self.traverse(child)

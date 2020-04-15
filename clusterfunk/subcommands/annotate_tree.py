@@ -7,7 +7,7 @@ from clusterfunk.utils import check_str_for_bool, prepare_tree
 def run(options):
     if options.deltran and options.acctran:
         raise ValueError("Can not use both acctran and deltran flags")
-    if options.traits_file is not None and options.indices is not None:
+    if options.traits_file is not None and options.from_tip_labels:
         raise ValueError("Can annotate from a file and tip labels at the same time. Run as two separate steps")
 
     tree = prepare_tree(options)
@@ -16,10 +16,10 @@ def run(options):
     if options.traits_file is not None:
         with open(options.traits_file, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
-            annotations = get_annotations("taxon", reader)
-        annotator.annotate_tips(annotations)
+            annotations = get_annotations(options.index_column, reader, options.traits)
+        annotator.annotate_tips(annotations, options.taxon_key_index, options.separator)
 
-    if options.indices is not None and options.separator is not None:
+    if options.from_tip_labels:
         for i in range(0, len(options.traits)):
             annotator.annotate_tips_from_label(options.traits[i], options.indices[i], options.separator)
 

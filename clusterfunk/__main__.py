@@ -71,6 +71,14 @@ def main(args=None):
             type=float,
             help='branch threshold used to distinguish new phylotype (default: 5E-6)')
 
+    subparser_phylotype.add_argument(
+            '-s',
+            '--suffix',
+            default="p",
+            type=str,
+            help='suffix for each phylotype'
+    )
+
     subparser_phylotype.set_defaults(func=clusterfunk.subcommands.phylotype.run)
     # _____________________________ tree annotator ______________________________#
     subparser_annotate = subparsers.add_parser(
@@ -91,8 +99,7 @@ def main(args=None):
             help='Space separated list of traits to annotate on tree')
 
     subparser_annotate.add_argument(
-            '-tf',
-            '--traits_file',
+            '--in-metadata',
             dest='traits_file',
             action='store',
             type=str,
@@ -111,7 +118,7 @@ def main(args=None):
             "--separator",
             dest="separator",
             type=str,
-            help="optional separator used to get trait"
+            help="optional separator used to split taxon label"
     )
 
     subparser_annotate.add_argument(
@@ -150,6 +157,26 @@ def main(args=None):
             help="A Boolean flag. In trait reconstruction, at a polytomy, when there is no intersection of traits from all children"
                  "should the trait that appears most in the children"
                  "be assigned. Default:False - the union of traits are assigned"
+    )
+    subparser_annotate.add_argument(
+            '--index-column',
+            dest="index_column",
+            default="taxon",
+            help="What column in the csv should be used to match the tip names."
+    )
+
+    subparser_annotate.add_argument(
+            '--taxon-key-index',
+            dest="taxon_key_index",
+            type=int,
+            help="After spliting taxon names at separator which entry matches the metadata index column entry."
+    )
+
+    subparser_annotate.add_argument(
+            "--from-tip-labels",
+            action="store_true",
+            dest="from_tip_labels",
+            default=False
     )
 
     subparser_annotate.add_argument(
@@ -193,7 +220,6 @@ def main(args=None):
             dest='filter',
             metavar="<key>=<value>",
             type=str,
-            nargs="+",
             help='optional filters for which tips should get annotation.')
 
     subparser_reannotate.set_defaults(func=clusterfunk.subcommands.reannotate_tree.run)
@@ -267,7 +293,12 @@ def main(args=None):
             required=True,
             help='The name of the annotation that will hold transitions. This also will form the base of the transition '
                  'label.')
-
+    subparser_label_transitions.add_argument(
+            '-ts',
+            '--transition_suffix',
+            type=str,
+            help='suffix for each transition'
+    )
     subparser_label_transitions.add_argument(
             "-e",
             "--exploded_trees",

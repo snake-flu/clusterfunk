@@ -5,7 +5,8 @@ from clusterfunk.utils import check_str_for_bool, prepare_tree
 
 def run(options):
     tree = prepare_tree(options)
-    annotator = TransitionAnnotator(options.trait, options.include_parent, options.transition_name)
+    annotator = TransitionAnnotator(options.trait, options.include_parent, options.transition_name,
+                                    options.transition_suffix)
 
     if options.exploded_trees:
         trees = annotator.split_at_transitions(tree, check_str_for_bool(options.From),
