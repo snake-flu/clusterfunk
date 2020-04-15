@@ -3,7 +3,7 @@ import csv
 from Bio import SeqIO
 
 
-def parse_taxon_set(file, schema, column=None):
+def parse_taxon_set(file, schema, index_column=None):
     taxon_set = []
     if schema == "fasta":
         for record in SeqIO.parse(file, "fasta"):
@@ -20,9 +20,25 @@ def parse_taxon_set(file, schema, column=None):
             metadata_file.seek(0)
             reader = csv.DictReader(metadata_file, dialect=dialect)
             for row in reader:
-                taxon_set.append(row[column].strip())
-
+                taxon_set.append(row[index_column].strip())
     return taxon_set
+
+
+def parse_taxon_sets_by_trait(file, tree, trait_name):
+    taxon_sets = []
+    values = []
+
+    with open(file, newline='') as metadata_file:
+        dialect = csv.Sniffer().sniff(metadata_file.read(1024))
+        metadata_file.seek(0)
+        reader = csv.DictReader(metadata_file, dialect=dialect)
+        for row in reader:
+            if row[trait_name] not in values:
+                values.append(row[trait_name])
+    for value in values:
+        taxon_sets.append({"value": value, "tip_labels": [tip.taxon.label for tip in tree.leaf_node_iter() if
+                                                          tip.annotations.get_value(trait_name) == value]})
+    return taxon_sets
 
 
 def prune_tree(tree, taxon_set, extract):
