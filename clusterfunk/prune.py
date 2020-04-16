@@ -46,8 +46,9 @@ class TreePruner:
     def parse_by_trait_value(self, tree, trait_name, regex):
         matcher = re.compile(regex)
         for tip in tree.leaf_node_iter():
-            if matcher.match(tip.annotations.get_value(trait_name)):
-                self.taxon_set.append(self.parse_data_taxon(tip.taxon.label))
+            if tip.annotations.get_value(trait_name):
+                if matcher.match(tip.annotations.get_value(trait_name)):
+                    self.taxon_set.append(self.parse_data_taxon(tip.taxon.label))
 
     def prune(self, tree):
         taxa_labels = [tip.taxon.label for tip in tree.leaf_node_iter() if

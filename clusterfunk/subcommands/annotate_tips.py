@@ -8,6 +8,7 @@ from clusterfunk.utils import check_str_for_bool, prepare_tree
 
 def run(options):
     tree = prepare_tree(options, options.input)
+
     annotator = TreeAnnotator(tree, re.compile(options.parse_taxon))
 
     if options.traits_file is not None:
@@ -27,9 +28,9 @@ def run(options):
             annotator.annotate_tips_from_label(trait, re.compile(regex))
 
     if options.where_trait is not None:
-        for string in options.from_taxon:
+        for string in options.where_trait:
             boolean_trait_name, regex = string.split("=")
-            trait = boolean_trait_name.split("_")
+            trait = boolean_trait_name.split("_")[0]
             annotator.add_boolean_trait(trait, boolean_trait_name, re.compile(regex))
 
     if options.mrca is not None:

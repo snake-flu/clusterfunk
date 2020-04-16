@@ -57,7 +57,7 @@ def main(args=None):
     subparser_phylotype = subparsers.add_parser(
             "phylotype",
             aliases=['phylotype_dat_tree'],
-            usage="clusterfunk phylotype [--threshold] [---suffix] --inputmy.tree --output my.phylotyped.tree",
+            usage="clusterfunk phylotype [--threshold] [---prefix] --inputmy.tree --output my.phylotyped.tree",
             help="Assigns phylotypes to a tree based on a branch length threshold",
             parents=[shared_arguments_parser]
     )
@@ -71,10 +71,10 @@ def main(args=None):
             help='branch threshold used to distinguish new phylotype (default: 5E-6)')
 
     subparser_phylotype.add_argument(
-            '--suffix',
+            '--prefix',
             default="p",
             type=str,
-            help='suffix for each phylotype. (default:p)'
+            help='prefix for each phylotype. (default:p)'
     )
 
     subparser_phylotype.set_defaults(func=clusterfunk.subcommands.phylotype.run)
@@ -139,12 +139,14 @@ def main(args=None):
             "--parse-data-key",
             dest="parse_data",
             metavar="<regex>",
+            default="(.*)",
             help="regex defined group(s) to construct keys from the data file to match the taxon labels"
     )
     from_meta_data.add_argument(
             "--parse-taxon-key",
             dest="parse_taxon",
             metavar="<regex>",
+            default="(.*)",
             help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
     subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tips.run)
@@ -289,9 +291,9 @@ def main(args=None):
             required=True,
             help='The name of the annotation that will hold transitions.')
     subparser_label_transitions.add_argument(
-            '--transition_suffix',
+            '--transition_prefix',
             type=str,
-            help='suffix for each transition value'
+            help='prefix for each transition value'
     )
 
     subparser_label_transitions.add_argument(
@@ -322,7 +324,8 @@ def main(args=None):
                  " the a discrete trait can be provided and the tree pruned based on the taxa annnoted by that trait. ",
             parents=[shared_arguments_parser]
     )
-    taxon_set_files = subparser_prune.add_mutually_exclusive_group(required=True)
+    taxon_set_master = subparser_prune.add_argument_group("Defining the taxon set")
+    taxon_set_files = taxon_set_master.add_mutually_exclusive_group(required=True)
 
     taxon_set_files.add_argument(
             "--fasta",
@@ -338,7 +341,6 @@ def main(args=None):
     )
     taxon_set_files.add_argument(
             "--trait",
-            nargs="+",
             dest="trait",
             help="A discrete trait. The tree will be pruned the tree for each value of the trait. In this case the"
                  " output will be interpreted as a directory."
@@ -420,7 +422,7 @@ def main(args=None):
             default='scion_id',
             help="the annotation name to be used in annotation each scion. default: scion_id"
     )
-    subparser_prune.set_defaults(func=clusterfunk.subcommands.graft.run)
+    subparser_gaft.set_defaults(func=clusterfunk.subcommands.graft.run)
 
     args = parser.parse_args()
 

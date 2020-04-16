@@ -32,9 +32,10 @@ def run(options):
         values = [tip.annotations.get_value(options.trait) for tip in tree.leaf_node_iter() if
                   tip.annotations.get_value(options.trait) is not None]
 
+        print(values)
         for value in values:
             pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), options.extract)
             copy_tree = copy.deepcopy(tree)
             regex = re.compile(value)
             pruner.parse_by_trait_value(copy_tree, options.trait, regex)
-            copy_tree.write(options.output + "/" + options.trait + "_" + value, schema="nexus")
+            copy_tree.write(path=options.output + "/" + options.trait + "_" + value + ".tree", schema="nexus")

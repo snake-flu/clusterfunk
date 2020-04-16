@@ -17,3 +17,5 @@ def run(options):
 
             annotator.annotate_nodes_from_tips(trait, acctran, ancestral_state)
             i += 1
+
+    tree.write(path=options.output, schema="nexus")

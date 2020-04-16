@@ -45,16 +45,19 @@ class TreeAnnotator:
         annotations = {}
         for tip in self.tree.leaf_node_iter():
             trait = {}
-            value_match = regex.match(tip.label)
+            value_match = regex.match(tip.taxon.label)
             if not value_match:
-                raise ValueError("taxon name %s in tree does not match annotation regex pattern" % tip.label)
-            value = "".join(value_match.groups())
+                warnings.showwarning("taxon name %s in tree does not match annotation regex pattern" % tip.taxon.label)
+                value = None
+            else:
+                value = "".join(value_match.groups())
             trait[trait_name] = value if len(value) > 0 or value is None else None
             annotations[tip.taxon.label] = trait
 
         self.annotate_tips(annotations)
 
     def add_boolean_trait(self, trait, boolean_trait_name, regex):
+
         for node in self.tree.postorder_node_iter():
             self.add_boolean(node, trait, boolean_trait_name, regex)
 
@@ -68,6 +71,7 @@ class TreeAnnotator:
                 setattr(node, boolean_trait_name, True)
             else:
                 setattr(node, boolean_trait_name, False)
+
             node.annotations.add_bound_attribute(boolean_trait_name)
 
     def annotate_nodes_from_tips(self, name, acctran, parent_state=None):
@@ -83,9 +87,9 @@ class TreeAnnotator:
     def annotate_node(self, tip_label, annotations):
 
         node = self.tree.find_node_with_taxon(
-            lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
+                lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
         if node is None:
-            warnings.warn("Taxon: %s not found in tree" % tip_label)
+            warnings.showwarning("Taxon: %s not found in tree" % tip_label)
         else:
             for a in annotations:
                 if len(annotations[a]) > 0:
