@@ -5,7 +5,7 @@ from clusterfunk.utils import prepare_tree
 
 
 def run(options):
-    tree = prepare_tree(options)
+    tree = prepare_tree(options, options.input)
     annotator = TreeAnnotator(tree)
 
     def predicate(node):

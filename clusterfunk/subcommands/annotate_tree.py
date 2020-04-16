@@ -10,7 +10,7 @@ def run(options):
     if options.traits_file is not None and options.from_tip_labels:
         raise ValueError("Can annotate from a file and tip labels at the same time. Run as two separate steps")
 
-    tree = prepare_tree(options)
+    tree = prepare_tree(options, options.input)
     annotator = TreeAnnotator(tree, options.majority_rule)
 
     if options.traits_file is not None:

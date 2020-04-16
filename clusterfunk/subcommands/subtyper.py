@@ -5,7 +5,7 @@ from clusterfunk.subtyper import Subtyper
 
 
 def run(options):
-    tree = prepare_tree(options)
+    tree = prepare_tree(options, options.input)
     subtyper = Subtyper(tree, options.index, options.separator)
     subtype = subtyper.get_subtype(options.taxon)
 

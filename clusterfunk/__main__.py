@@ -376,6 +376,44 @@ def main(args=None):
 
     subparser_prune.set_defaults(func=clusterfunk.subcommands.prune.run)
 
+    # _____________________________ graft ______________________________#
+    subparser_gaft = subparsers.add_parser(
+            "graft",
+            aliases=['graft_dat_tree'],
+            usage="clusterfunk graft --scion [trees1.tree tree2.tree] -i my.guide.tree -o my.combined.tree ",
+            help="This function grafts trees (scion) onto a guide tree (input). The scion tree is grafted onto"
+                 "the guide tree at the MRCA of the tips shared between the two. Any shared tips originally in the guide tree"
+                 "are then removed. All incoming trees must be in the same format [nexus,newick,ect.]",
+            parents=[shared_arguments_parser]
+    )
+
+    subparser_gaft.add_argument(
+            "--scion",
+            required=True,
+            nargs="+",
+            help="The incoming trees that will be grafted onto the input tree"
+    )
+
+    subparser_gaft.add_argument(
+            "--full_graft",
+            action="store_true",
+            default=False,
+            help="A boolean flag to remove any remaining original tips from the guide tree that were not found in any"
+                 "scion tree. i.e. all tips in the output tree come from the scions"
+    )
+    subparser_gaft.add_argument(
+            "--annotate_scions",
+            nargs="+",
+            help="A list of annotation values to add to the scion trees in the same order the trees are listed."
+    )
+    subparser_gaft.add_argument(
+            "--scion_annotation_name",
+            type=str,
+            default='scion_id',
+            help="the annotation name to be used in annotation each scion. default: scion_id"
+    )
+    subparser_prune.set_defaults(func=clusterfunk.subcommands.graft.run)
+
     args = parser.parse_args()
 
     if hasattr(args, "func"):

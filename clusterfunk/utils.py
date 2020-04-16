@@ -26,8 +26,9 @@ def collapse_nodes(tree, predicate):
             node.edge.collapse(adjust_collapsed_head_children_edge_lengths=True)
 
 
-def prepare_tree(options):
-    tree = parse_tree(options.input, options.format)
+def prepare_tree(options, input_file_name=None):
+    input_path = input_file_name if input_file_name is not None else options.input
+    tree = parse_tree(input_path, options.format)
     if options.collapse:
-        collapse_nodes(tree, lambda node: node.edge.length < options.collapse)
+        collapse_nodes(tree, lambda node: node.edge.length <= options.collapse)
     return tree
