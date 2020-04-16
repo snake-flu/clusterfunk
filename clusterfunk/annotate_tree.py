@@ -1,3 +1,4 @@
+import re
 import warnings
 from collections import Counter
 
@@ -27,38 +28,43 @@ class TraversalAction:
 
 
 class TreeAnnotator:
-    def __init__(self, tree, majority_rule=False):
+    def __init__(self, tree, taxon_regex=re.compile("(.*)"), majority_rule=False):
         self.tree = tree
         self.root = tree.seed_node
         self.majority_rule = majority_rule
-        self.taxon_parser = lambda x: x
+        self.taxon_regex = taxon_regex
         pass
 
-    def annotate_tips_from_label(self, traitName, index, separator):
+    def taxon_parser(self, taxon_label):
+        match = self.taxon_regex.match(taxon_label)
+        if not match:
+            raise ValueError("taxon name %s in tree file does not match regex pattern" % taxon_label)
+        return "".join(match.groups())
+
+    def annotate_tips_from_label(self, trait_name, regex):
         annotations = {}
         for tip in self.tree.leaf_node_iter():
             trait = {}
-            value = tip.taxon.label.split(separator)[index]
-            trait[traitName] = value if len(value) > 0 else None
+            value_match = regex.match(tip.label)
+            if not value_match:
+                raise ValueError("taxon name %s in tree does not match annotation regex pattern" % tip.label)
+            value = "".join(value_match.groups())
+            trait[trait_name] = value if len(value) > 0 or value is None else None
             annotations[tip.taxon.label] = trait
 
         self.annotate_tips(annotations)
 
-    def add_boolean_trait(self, trait, value):
+    def add_boolean_trait(self, trait, boolean_trait_name, regex):
         for node in self.tree.postorder_node_iter():
-            self.add_boolean(node, trait, value)
+            self.add_boolean(node, trait, boolean_trait_name, regex)
 
-    def annotate_tips(self, annotations, index=None, separator=None):
-        if index is not None and separator is not None:
-            self.taxon_parser = lambda x: x.split(separator)[index]
+    def annotate_tips(self, annotations):
         for tip_label in annotations:
             self.annotate_node(tip_label, annotations[tip_label])
-        self.taxon_parser = lambda x: x
 
-    def add_boolean(self, node, trait, value):
-        boolean_trait_name = "%s_%s" % (trait, str(value))
+    def add_boolean(self, node, trait, boolean_trait_name, regex):
         if node.annotations.get_value(trait) is not None:
-            if node.annotations.get_value(trait) == value:
+            if regex.match(node.annotations.get_value(trait)):
                 setattr(node, boolean_trait_name, True)
             else:
                 setattr(node, boolean_trait_name, False)
@@ -166,12 +172,15 @@ class TreeAnnotator:
             self.reconstruct_ancestors(child, assigned_states, acctran, name)
 
 
-def get_annotations(taxon_key, annotation_list, traits):
+def get_annotations(taxon_key, data_regex, annotation_list, traits):
     annotation_dict = {}
     for row in annotation_list:
-        print(row)
         annotations = {}
+        taxon_name_match = data_regex.match(row[taxon_key])
+        if not taxon_name_match:
+            raise ValueError("taxon name %s in input file does not match regex pattern" % row[taxon_key])
+        key_name = "".join(taxon_name_match.groups())
         for trait in traits:
             annotations[trait] = row[trait]
-        annotation_dict[row[taxon_key]] = annotations
+        annotation_dict[key_name] = annotations
     return annotation_dict

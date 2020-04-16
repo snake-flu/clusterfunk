@@ -5,6 +5,7 @@ from clusterfunk.utils import prepare_tree
 def run(options):
     guide_tree = prepare_tree(options)
     root_stock = RootStock(guide_tree)
+
     i = 0
     for path in options.scions:
         scion_tree = prepare_tree(options, path)

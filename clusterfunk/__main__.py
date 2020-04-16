@@ -47,7 +47,7 @@ def main(args=None):
             "--collapse_to_polytomies",
             dest='collapse',
             type=float,
-            help='A optional flag to collapse branches with length < the input before running the rule.')
+            help='A optional flag to collapse branches with length <= the input before running the rule.')
 
     subparsers = parser.add_subparsers(
             title="Available subcommands", help="", metavar=""
@@ -63,7 +63,6 @@ def main(args=None):
     )
 
     subparser_phylotype.add_argument(
-            '-t',
             '--threshold',
             dest='threshold',
             action='store',
@@ -72,38 +71,30 @@ def main(args=None):
             help='branch threshold used to distinguish new phylotype (default: 5E-6)')
 
     subparser_phylotype.add_argument(
-            '-s',
             '--suffix',
             default="p",
             type=str,
-            help='suffix for each phylotype'
+            help='suffix for each phylotype. (default:p)'
     )
 
     subparser_phylotype.set_defaults(func=clusterfunk.subcommands.phylotype.run)
     # _____________________________ tree annotator ______________________________#
     subparser_annotate = subparsers.add_parser(
-            "annotate_tree",
-            aliases=['annotate_dat_tree'],
-            usage="clusterfunk annotate [--acctran/--deltran] [--ancestral_state UK] --traits country --input my.tree --output my.annotated.tree ",
-            help="Annotates a tree. Can annotate tips from a csv, and/or annotate internal nodes from tips based on parsimony",
+            "annotate_tips",
+            aliases=['annotate_dat_tips'],
+            usage="clusterfunk annotate  --input my.tree --output my.annotated.tree ",
+            help="Annotates the tips of tree. Can annotate tips from a csv/tsv and/or taxon labels",
             parents=[shared_arguments_parser]
     )
 
     subparser_annotate.add_argument(
-            "-t",
-            "--traits",
-            metavar='traits',
-            required=True,
-            type=str,
+            '--where-trait',
+            dest="where_trait",
+            metavar="<trait>_<qualifier>=<regex>",
             nargs="+",
-            help='Space separated list of traits to annotate on tree')
-
-    subparser_annotate.add_argument(
-            '--boolean-values',
-            dest="values",
-            nargs="+",
-            help="A list of values in order of the traits listed. A boolean annotation will be added for each node"
-                 "with the trait sepecifying whether or not it equals this value")
+            help=" A boolean annotation will be added for each node "
+                 "with the new trait specifying whether the annotation <trait> not it matches this value. the new trait will be called "
+                 "<trait>_<qualifier>")
 
     subparser_annotate.add_argument(
             '-mrca',
@@ -117,58 +108,11 @@ def main(args=None):
     from_meta_data = subparser_annotate.add_argument_group("Annotation from metadata file")
 
     from_tip_group.add_argument(
-            "--from-tip-labels",
-            action="store_true",
-            dest="from_tip_labels",
-            help="Boolean flag signifying traits will come from tip labels",
-            default=False
-    )
-
-    from_tip_group.add_argument(
-            '--indices',
-            dest='indices',
-            action='store',
-            type=int,
+            "--from-taxon",
             nargs="+",
-            help='optional indices for use in getting traits from tip labels')
-
-    from_tip_group.add_argument(
-            "-s",
-            "--separator",
-            dest="separator",
-            type=str,
-            help="optional separator used to split taxon label"
-    )
-
-    ancestral_reconstruction = subparser_annotate.add_argument_group("Ancestral reconstruction")
-
-    ancestral_reconstruction.add_argument(
-            '-acc',
-            '--acctran',
-            dest='acctran',
-            action='store_true',
-            help="Boolean flag to use acctran reconstruction")
-
-    ancestral_reconstruction.add_argument(
-            '-del',
-            '--deltran',
-            dest='deltran',
-            action='store_true',
-            help="Boolean flag to use deltran reconstruction")
-
-    ancestral_reconstruction.add_argument(
-            '--ancestral_state',
-            metavar='ancestral_state',
-            action='store',
-            nargs="+",
-            help="Option to Set the ancestral state for the tree. In same order of traits")
-    ancestral_reconstruction.add_argument(
-            '--majority_rule',
-            action='store_true',
-            default=False,
-            help="A Boolean flag. In trait reconstruction, at a polytomy, when there is no intersection of traits from all children"
-                 "should the trait that appears most in the children"
-                 "be assigned. Default:False - the union of traits are assigned"
+            dest="from_taxon",
+            metavar="<trait>=<regex>",
+            help="Space separated list of regex group(s) parsing trait values from taxon label"
     )
 
     from_meta_data.add_argument(
@@ -176,7 +120,13 @@ def main(args=None):
             dest='traits_file',
             action='store',
             type=str,
-            help='optional csv file with tip annotations ')
+            help='optional csv file with tip annotations')
+    from_meta_data.add_argument(
+            "--trait-columns",
+            dest="trait_columns",
+            type=str,
+            nargs="+",
+            help='Space separated list of columns to annotate on tree')
 
     from_meta_data.add_argument(
             '--index-column',
@@ -186,64 +136,97 @@ def main(args=None):
     )
 
     from_meta_data.add_argument(
-            '--taxon-key-index',
-            dest="taxon_key_index",
-            type=int,
-            help="After spliting taxon names at separator which entry matches the metadata index column entry."
+            "--parse-data-key",
+            dest="parse_data",
+            metavar="<regex>",
+            help="regex defined group(s) to construct keys from the data file to match the taxon labels"
     )
     from_meta_data.add_argument(
-            "--taxon-separator",
-            dest="taxon_separator",
-            type=str,
-            help="optional separator used to split taxon label. To be used if only part of a taxon name is to be matched"
-                 "in the metatdata file"
+            "--parse-taxon-key",
+            dest="parse_taxon",
+            metavar="<regex>",
+            help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
+    subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tips.run)
+    # _____________________________ Ancestral reconstruction ______________________________#
 
-    subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tree.run)
-
-    # _____________________________ re annotator ______________________________#
-    subparser_reannotate = subparsers.add_parser(
-            "reannotate_tree",
-            aliases=['annotate_dat_tree_again'],
-            usage="clusterfunk reannotate  --traits country -i my.tree -o my.annotated.tree ",
-            help="ReAnnotates a tree. It assigns a traits from a csv to tips. then grabs the mrca of those tips and"
-                 " pushes the annotation up to any new tip",
+    subparser_ancestral_reconstruction = subparsers.add_parser(
+            "ancestral_reconstruction",
+            usage="clusterfunk ancestral_reconstruction --acctran/--deltran [--ancestral_state] [--majority_rule] "
+                  "--traits country -i my.tree -o my.annotated.tree ",
+            help="Reconstructs ancestral states on internal nodes using Fitch parsimony algorithm",
             parents=[shared_arguments_parser]
     )
 
-    subparser_reannotate.add_argument(
+    reconstruction_options = subparser_ancestral_reconstruction.add_mutually_exclusive_group()
+
+    reconstruction_options.add_argument(
+            '-acc',
+            '--acctran',
+            dest='acctran',
+            action='store_true',
+            help="Boolean flag to use acctran reconstruction")
+
+    reconstruction_options.add_argument(
+            '-del',
+            '--deltran',
+            dest='deltran',
+            action='store_true',
+            help="Boolean flag to use deltran reconstruction")
+    subparser_ancestral_reconstruction.add_argument(
+            "--traits",
+            nargs="+",
+            help="the traits whose values will be reconstructed"
+    )
+    subparser_ancestral_reconstruction.add_argument(
+            '--ancestral_state',
+            metavar='ancestral_state',
+            action='store',
+            nargs="+",
+            help="Option to set the ancestral state for the tree. In same order of traits")
+    subparser_ancestral_reconstruction.add_argument(
+            '--majority_rule',
+            action='store_true',
+            default=False,
+            help="A Boolean flag. In first stage of the Fitch algorithm, at a polytomy, when there is no intersection of traits from all children"
+                 "should the trait that appears most in the children"
+                 "be assigned. Default:False - the union of traits are assigned"
+    )
+    subparser_ancestral_reconstruction.set_defaults(func=clusterfunk.subcommands.ancestral_reconstruction.run)
+
+    # _____________________________ push annotations to tips ______________________________#
+    subparser_push_annotations_to_tips = subparsers.add_parser(
+            "annotate_tips_from_nodes",
+            usage="clusterfunk annotate_tips_from_nodes  --traits country -i my.tree -o my.annotated.tree ",
+            help="This funk pushes annotations to tips. It identifies the  mrca of nodes with each value of the trait"
+                 " provided and pushes the annotation up to any descendent tip",
+            parents=[shared_arguments_parser]
+    )
+
+    subparser_push_annotations_to_tips.add_argument(
             "-t",
             "--traits",
             metavar='traits',
             required=True,
             type=str,
             nargs="+",
-            help='Space separated list of traits to annotate on tree')
+            help='Space separated list of discrete traits to annotate on tree')
 
-    subparser_reannotate.add_argument(
-            '-tf',
-            '--traits_file',
-            dest='traits_file',
-            action='store',
+    subparser_push_annotations_to_tips.add_argument(
+            '--stop-where-trait',
+            dest='stop_where_trait',
+            metavar="<trait>=<regex>",
             type=str,
-            help='optional csv file with tip annotations assumes taxon is the key column.')
+            help='optional filter for when to stop pushing annotation forward in preorder traversal from mrca.')
 
-    subparser_reannotate.add_argument(
-            '-f',
-            '--filter',
-            dest='filter',
-            metavar="<key>=<value>",
-            type=str,
-            help='optional filters for which tips should get annotation.')
-
-    subparser_reannotate.set_defaults(func=clusterfunk.subcommands.reannotate_tree.run)
+    subparser_push_annotations_to_tips.set_defaults(func=clusterfunk.subcommands.push_annotations_to_tips.run)
 
     # _____________________________ extract_tip_annotations ______________________________#
     subparser_extract_tip_annotations = subparsers.add_parser(
             "extract_tip_annotations",
             aliases=['extract_dat_tree'],
             usage="clusterfunk extract_annotations --traits country -i my.annotated.tree -o annotations.csv",
-            help="extracts annotations from tips in a tree",
+            help="extracts annotations from tips in a tree and ouputs a csv",
             parents=[shared_arguments_parser]
 
     )
@@ -277,13 +260,12 @@ def main(args=None):
             "label_transitions",
             aliases=['label_dat_transition'],
             usage="clusterfunk label_transitions --trait UK --from False --to True --transition_name introduction -i my.tree -o my.labeled.tree",
-            help="counts and labels transitions of binary traits on a tree",
+            help="counts and labels transitions traits on a tree",
             parents=[shared_arguments_parser]
 
     )
 
     subparser_label_transitions.add_argument(
-            "-t",
             "--trait",
             metavar='trait',
             type=str,
@@ -311,6 +293,7 @@ def main(args=None):
             type=str,
             help='suffix for each transition value'
     )
+
     subparser_label_transitions.add_argument(
             "-e",
             "--exploded_trees",
@@ -333,9 +316,10 @@ def main(args=None):
     subparser_prune = subparsers.add_parser(
             "prune",
             aliases=['prune_dat_tree'],
-            usage="clusterfunk prune --extract [--fasta file.fas] [--taxon taxon.set.txt] [--metadata metadata.csv/tsv --index-column taxon] -i my.tree -o my.smaller.tree ",
+            usage="clusterfunk prune --extract [--fasta file.fas] [--taxon taxon.set.txt] [--metadata metadata.csv/tsv --index-column taxon] [--where-trait <trait>=<regex> ] -i my.tree -o my.smaller.tree ",
             help="Prunes a tree either removing the specified taxa or keeping only those specified. "
-                 "Taxa can be specified from a fasta file, text file or metadata file with the taxon label indicated",
+                 "Taxa can be specified from a fasta file, text file or metadata file with the taxon label indicated. Additionally,"
+                 " the a discrete trait can be provided and the tree pruned based on the taxa annnoted by that trait. ",
             parents=[shared_arguments_parser]
     )
     taxon_set_files = subparser_prune.add_mutually_exclusive_group(required=True)
@@ -352,20 +336,44 @@ def main(args=None):
             "--metadata",
             help="incoming csv/tsv file defining taxon set."
     )
+    taxon_set_files.add_argument(
+            "--trait",
+            nargs="+",
+            dest="trait",
+            help="A discrete trait. The tree will be pruned the tree for each value of the trait. In this case the"
+                 " output will be interpreted as a directory."
+    )
 
-    meta_data_options = subparser_prune.add_mutually_exclusive_group()
+    taxon_set_files.add_argument(
+            "--where-trait",
+            nargs="+",
+            dest="where_trait",
+            metavar="<trait>=<regex>",
+            help="Taxa defined by annotation value"
+    )
+
+    meta_data_options = subparser_prune.add_argument_group("metadata options")
 
     meta_data_options.add_argument(
             "--index-column",
-            dest="index",
+            dest="index_column",
             help="column of metadata that holds the taxon names"
     )
-    meta_data_options.add_argument(
-            "--trait-column",
-            dest="traits",
-            help="column of metadata that holds the discrete trait. A tree will be output in the output directory for each"
-                 "value in this trait"
+    subparser_prune.add_argument(
+            "--parse-data-key",
+            dest="parse_data",
+            metavar="<regex>",
+            default="(.*)",
+            help="regex defined group(s) to construct keys from the data file to match the taxon labels"
     )
+    subparser_prune.add_argument(
+            "--parse-taxon-key",
+            dest="parse_taxon",
+            metavar="<regex>",
+            default="(.*)",
+            help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
+    )
+
     subparser_prune.add_argument(
             "--extract",
             action="store_true",
@@ -381,8 +389,8 @@ def main(args=None):
             "graft",
             aliases=['graft_dat_tree'],
             usage="clusterfunk graft --scion [trees1.tree tree2.tree] -i my.guide.tree -o my.combined.tree ",
-            help="This function grafts trees (scion) onto a guide tree (input). The scion tree is grafted onto"
-                 "the guide tree at the MRCA of the tips shared between the two. Any shared tips originally in the guide tree"
+            help="This function grafts trees (scions) onto a guide tree (input). The scion tree is grafted onto "
+                 "the guide tree at the MRCA of the tips shared between the two. Any shared tips originally in the guide tree "
                  "are then removed. All incoming trees must be in the same format [nexus,newick,ect.]",
             parents=[shared_arguments_parser]
     )

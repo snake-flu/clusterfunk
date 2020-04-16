@@ -8,7 +8,7 @@ def run(options):
     annotations = get_annotations(tree, options.traits)
 
     with open(options.output, "w") as csvfile:
-        fileheader = ["taxon"] + options.traits
+        fileheader = ["taxon"].extend(options.traits)
         writer = csv.DictWriter(csvfile, fieldnames=fileheader)
         writer.writeheader()
         for tip_annotation in annotations:

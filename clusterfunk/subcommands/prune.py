@@ -1,32 +1,40 @@
 import copy
 import os
-from clusterfunk.prune import parse_taxon_set, prune_tree, parse_taxon_sets_by_trait
+import re
+
+from clusterfunk.prune import TreePruner
 from clusterfunk.utils import prepare_tree
 
 
 def run(options):
     tree = prepare_tree(options, options.input)
-    taxa = []
-    if options.fasta is not None:
-        taxa = parse_taxon_set(options.fasta, "fasta")
 
-    elif options.taxon is not None:
-        taxa = parse_taxon_set(options.taxon, "txt")
-    elif options.metadata is not None:
-        if options.index is not None:
-            taxa = parse_taxon_set(options.metadata, "metadata", index_column=options.index)
+    if options.trait is None:
+        pruner = TreePruner(re.compile(options.parse_data), re.compile(options.parse_taxon), options.extract)
+        if options.fasta is not None:
+            pruner.parse_fasta(options.fasta)
+        elif options.metadata is not None:
+            pruner.parse_metadata(options.metadata, options.index_column)
+        elif options.taxon is not None:
+            pruner.parse_taxon(options.taxon)
+        elif options.where_trait is not None:
+            trait, pattern = options.where_trait.split("=")
+            regex = re.compile(pattern)
+            pruner.parse_by_trait_value(tree, trait, regex)
 
-    if len(taxa) == 0:
-        print("No taxa found in input files")
-        return
-    if not options.metadata or options.traits is None:
-        prune_tree(tree, taxa, options.extract)
-        tree.write(path=options.output, schema=options.format)
+        pruner.prune(tree)
+
+        tree.write(path=options.output, schema="nexus")
     else:
         if not os.path.exists(options.output):
             os.makedirs(options.output)
-        taxa = parse_taxon_sets_by_trait(options.metadata, tree, options.traits)
-        for taxon_set in taxa:
-            tree_copy = copy.deepcopy(tree)
-            prune_tree(tree_copy, taxon_set["tip_labels"], options.extract)
-            tree.write(path=options.output + "/" + options.traits + "_" + taxa["value"], schema=options.format)
+
+        values = [tip.annotations.get_value(options.trait) for tip in tree.leaf_node_iter() if
+                  tip.annotations.get_value(options.trait) is not None]
+
+        for value in values:
+            pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), options.extract)
+            copy_tree = copy.deepcopy(tree)
+            regex = re.compile(value)
+            pruner.parse_by_trait_value(copy_tree, options.trait, regex)
+            copy_tree.write(options.output + "/" + options.trait + "_" + value, schema="nexus")
