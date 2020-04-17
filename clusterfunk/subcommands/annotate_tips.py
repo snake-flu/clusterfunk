@@ -15,7 +15,7 @@ def run(options):
         get_data_key = re.compile(options.parse_data)
 
         with open(options.traits_file, newline='') as metadata:
-            dialect = csv.Sniffer().sniff(metadata.read(1024))
+            dialect = csv.Sniffer().sniff(metadata.readline())
             metadata.seek(0)
             reader = csv.DictReader(metadata, dialect=dialect)
             annotations = get_annotations(reader, options.index_column, get_data_key, options.trait_columns)

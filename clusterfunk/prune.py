@@ -36,7 +36,7 @@ class TreePruner:
 
     def parse_metadata(self, file, index_column):
         with open(file, newline='') as metadata_file:
-            dialect = csv.Sniffer().sniff(metadata_file.read(1024))
+            dialect = csv.Sniffer().sniff(metadata_file.readline())
             metadata_file.seek(0)
             reader = csv.DictReader(metadata_file, dialect=dialect)
             for row in reader:
