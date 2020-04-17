@@ -262,7 +262,7 @@ def main(args=None):
             "label_transitions",
             aliases=['label_dat_transition'],
             usage="clusterfunk label_transitions --trait UK --from False --to True --transition_name introduction -i my.tree -o my.labeled.tree",
-            help="counts and labels transitions traits on a tree",
+            help="counts and labels transitions of traits on a tree",
             parents=[shared_arguments_parser]
 
     )
@@ -320,8 +320,7 @@ def main(args=None):
             aliases=['prune_dat_tree'],
             usage="clusterfunk prune --extract [--fasta file.fas] [--taxon taxon.set.txt] [--metadata metadata.csv/tsv --index-column taxon] [--where-trait <trait>=<regex> ] -i my.tree -o my.smaller.tree ",
             help="Prunes a tree either removing the specified taxa or keeping only those specified. "
-                 "Taxa can be specified from a fasta file, text file or metadata file with the taxon label indicated. Additionally,"
-                 " the a discrete trait can be provided and the tree pruned based on the taxa annnoted by that trait. ",
+                 "Taxa can be specified from a fasta file, text file, metadata file, or by an annotation.",
             parents=[shared_arguments_parser]
     )
     taxon_set_master = subparser_prune.add_argument_group("Defining the taxon set")

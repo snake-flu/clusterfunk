@@ -3,7 +3,7 @@ import re
 from clusterfunk.annotate_tree import *
 import csv
 
-from clusterfunk.utils import check_str_for_bool, prepare_tree
+from clusterfunk.utils import prepare_tree
 
 
 def run(options):
@@ -18,8 +18,7 @@ def run(options):
             dialect = csv.Sniffer().sniff(metadata.read(1024))
             metadata.seek(0)
             reader = csv.DictReader(metadata, dialect=dialect)
-            # TODO make one function annotate from metatdata
-            annotations = get_annotations(options.index_column, get_data_key, reader, options.trait_columns)
+            annotations = get_annotations(reader, options.index_column, get_data_key, options.trait_columns)
         annotator.annotate_tips(annotations)
 
     if options.from_taxon:

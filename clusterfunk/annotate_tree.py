@@ -46,8 +46,8 @@ class TreeAnnotator:
         for tip in self.tree.leaf_node_iter():
             trait = {}
             value_match = regex.match(tip.taxon.label)
-            if not value_match:
-                warnings.showwarning("taxon name %s in tree does not match annotation regex pattern" % tip.taxon.label)
+            if value_match is None:
+                warnings.warn("taxon name %s in tree does not match annotation regex pattern" % tip.taxon.label)
                 value = None
             else:
                 value = "".join(value_match.groups())
@@ -67,7 +67,7 @@ class TreeAnnotator:
 
     def add_boolean(self, node, trait, boolean_trait_name, regex):
         if node.annotations.get_value(trait) is not None:
-            if regex.match(node.annotations.get_value(trait)):
+            if regex.match(str(node.annotations.get_value(trait))):
                 setattr(node, boolean_trait_name, True)
             else:
                 setattr(node, boolean_trait_name, False)
@@ -89,10 +89,11 @@ class TreeAnnotator:
         node = self.tree.find_node_with_taxon(
                 lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
         if node is None:
-            warnings.showwarning("Taxon: %s not found in tree" % tip_label)
+            warnings.warn("Taxon: %s not found in tree" % tip_label, UserWarning)
         else:
             for a in annotations:
-                if len(annotations[a]) > 0:
+                if annotations[a] and (type(annotations[a]) is str and len(annotations[a]) > 0) or type(
+                        annotations[a]) is not str:
                     setattr(node, a, check_str_for_bool(annotations[a]))
                     node.annotations.add_bound_attribute(a)
 
@@ -176,13 +177,20 @@ class TreeAnnotator:
             self.reconstruct_ancestors(child, assigned_states, acctran, name)
 
 
-def get_annotations(taxon_key, data_regex, annotation_list, traits):
+def get_annotations(annotation_list, index_column, data_name_matcher, traits):
+    """
+    :param annotation_list: list of dictionaries that hold annotatations
+    :param index_column: the key in the dictionary used to identify the taxon
+    :param data_name_matcher: regex to parse the entries in the index column into groups to match taxon name g
+    :param traits: name of trait keys to annotate
+    :return: a dictionary keyed by parsed index column entries. Entries are dictionaries with trait and value pairs
+    """
     annotation_dict = {}
     for row in annotation_list:
         annotations = {}
-        taxon_name_match = data_regex.match(row[taxon_key])
+        taxon_name_match = data_name_matcher.match(row[index_column])
         if not taxon_name_match:
-            raise ValueError("taxon name %s in input file does not match regex pattern" % row[taxon_key])
+            raise ValueError("taxon name %s in input file does not match regex pattern" % row[index_column])
         key_name = "".join(taxon_name_match.groups())
         for trait in traits:
             annotations[trait] = row[trait]

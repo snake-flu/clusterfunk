@@ -1,8 +1,9 @@
+import re
 import unittest
 
 import dendropy
 
-from clusterfunk.annotate_tree import TreeAnnotator
+from clusterfunk.annotate_tree import TreeAnnotator, get_annotations
 
 
 class AnnotationTest(unittest.TestCase):
@@ -19,9 +20,8 @@ class AnnotationTest(unittest.TestCase):
         self.assertEqual(self.tree.find_node_with_taxon_label("C|bat").annotations.get_value("test"), 2)
 
     def test_annotation_from_tip_label(self):
-        self.annotator.annotate_tips_from_label("host", 1, "|")
-        self.annotator.annotate_tips_from_label("name", 0, "|")
-
+        self.annotator.annotate_tips_from_label("host", re.compile(".*\|(.*)"))
+        self.annotator.annotate_tips_from_label("name", re.compile("(.*)\|.*"))
 
         self.assertEqual(self.tree.find_node_with_taxon_label("A|human").annotations.get_value("host"), "human")
         self.assertEqual(self.tree.find_node_with_taxon_label("A|human").annotations.get_value("name"), "A")
@@ -29,7 +29,25 @@ class AnnotationTest(unittest.TestCase):
         self.assertEqual(self.tree.find_node_with_taxon_label("D|").annotations.get_value("host"), None)
         self.assertEqual(self.tree.find_node_with_taxon_label("D|").annotations.get_value("name"), "D")
 
+    def test_get_annotations(self):
+        annotator = TreeAnnotator(self.tree, re.compile("(.*)\|.*"))
 
+        raw_annotations = [{"index_column": "A-t", "value": "human", "ignore": "T"},
+                           {"index_column": "C-t", "value": "bat"}]
+        annotations = get_annotations(raw_annotations, "index_column", re.compile("(.+)-.*"), ["value"])
+        annotator.annotate_tips(annotations)
+        self.assertEqual(self.tree.find_node_with_taxon_label("A|human").annotations.get_value("value"), "human")
+        self.assertEqual(self.tree.find_node_with_taxon_label("C|bat").annotations.get_value("value"), "bat")
+        self.assertIsNone(self.tree.find_node_with_taxon_label("A|human").annotations.get_value("ignore"), "human")
+
+    def test_boolean(self):
+        annotations = {"A|human": {"test": 1},
+                       "B|camel": {"test": 1},
+                       "C|bat": {"test": 2}}
+        self.annotator.annotate_tips(annotations)
+
+        self.annotator.add_boolean_trait("test", "test_1", re.compile("1"))
+        self.assertEqual(self.tree.find_node_with_taxon_label("A|human").annotations.get_value("test_1"), True)
 
 
 if __name__ == '__main__':
