@@ -15,41 +15,50 @@ and test with
 python setup.py test
 ```
 
-## Adding functions to this suite
-Ideally the function name should be used as the filename and the argparse group. In the following example,
-the function name is `cluster_dat_junk`.
-1. Add your script to directory `clusterfunk` e.g. `clusterfunk/cluster_dat_junk.py`
-2. Update `clusterfunk/__init__.py` and `clusterfunk/subcommands/__init__.py` by adding the command name to the `all` lists
-3. Add a new command line parameter section to `clusterfunk/__main__.py`
-This should start by defining a new argparse group, e.g.
+Commands
 ```
-subparser_cluster_dat_junk = subparsers.add_parser(
-        "cluster_dat_junk",
-        usage="clusterfunk cluster_dat_junk -i <input>",
-        help="Example command",
-    )
-```
-then include all the arguments, e.g.
-```
-    subparser_cluster_dat_junk.add_argument(
-        "-i",
-        "--input_file",
-        dest="input_file",
-        action="store",
-        type=str,
-        help="Input file: something about the input file format",
-    )
-```
-and end with the entry point
-```
-    subparser_cluster_dat_junk.set_defaults(func=clusterfunk.subcommands.cluster_dat_junk.run)
-```
-4. Create file `clusterfunk/subcommands/cluster_dat_junk.py` which defines how to `run` given the command line parameters. Alternatively, specify the entrypoint within the main script file.
-5. If you have tests, add the test data to a subdirectory e.g. `tests/data/cluster_dat_junk`, and add the test file
-`tests/cluster_dat_junk_test.py`. This file should contain unit tests which have names `test_*` and ideally be informative about which function they test/the result.
-6. If the script has any new dependencies, update `install_requires` section of `setup.py` - this means that it can be pip installed from a conda environment file without a hitch.
+ clusterfunk -h
+usage: clusterfunk <subcommand> <options>
 
+Miscellaneous clustering tools
 
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
 
-
-
+Available subcommands:
+  
+    phylotype (phylotype_dat_tree)
+                        Assigns phylotypes to a tree based on a branch length
+                        threshold
+    annotate_tips (annotate_dat_tips)
+                        Annotates the tips of tree. Can annotate tips from a
+                        csv/tsv and/or taxon labels
+    ancestral_reconstruction
+                        Reconstructs ancestral states on internal nodes using
+                        Fitch parsimony algorithm
+    annotate_tips_from_nodes
+                        This funk pushes annotations to tips. It identifies
+                        the mrca of nodes with each value of the trait
+                        provided and pushes the annotation up to any
+                        descendent tip
+    extract_tip_annotations (extract_dat_tree)
+                        extracts annotations from tips in a tree and ouputs a
+                        csv
+    get_taxa (get_dat_taxa)
+                        extracts taxa labels from tips in a tree
+    label_transitions (label_dat_transition)
+                        counts and labels transitions of traits on a tree
+    prune (prune_dat_tree)
+                        Prunes a tree either removing the specified taxa or
+                        keeping only those specified. Taxa can be specified
+                        from a fasta file, text file, metadata file, or by an
+                        annotation.
+    graft (graft_dat_tree)
+                        This function grafts trees (scions) onto a guide tree
+                        (input). The scion tree is grafted onto the guide tree
+                        at the MRCA of the tips shared between the two. Any
+                        shared tips originally in the guide tree are then
+                        removed. All incoming trees must be in the same format
+                        [nexus,newick,ect.]
+```
