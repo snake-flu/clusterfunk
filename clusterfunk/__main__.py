@@ -272,7 +272,7 @@ def main(args=None):
             metavar='trait',
             type=str,
             required=True,
-            help=' Trait whose transitions are begin put on tree')
+            help=' Trait whose transitions are being put on tree')
 
     subparser_label_transitions.add_argument(
             "--from",
@@ -285,13 +285,13 @@ def main(args=None):
             type=str,
             help='Label transitions to this state. Can be combined with from.')
     subparser_label_transitions.add_argument(
-            "--transition_name",
+            "--transition-name",
             dest='transition_name',
             type=str,
             required=True,
             help='The name of the annotation that will hold transitions.')
     subparser_label_transitions.add_argument(
-            '--transition_prefix',
+            '--transition-prefix',
             type=str,
             help='prefix for each transition value'
     )
