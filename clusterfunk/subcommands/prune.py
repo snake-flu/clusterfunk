@@ -18,9 +18,10 @@ def run(options):
         elif options.taxon is not None:
             pruner.parse_taxon(options.taxon)
         elif options.where_trait is not None:
-            trait, pattern = options.where_trait.split("=")
-            regex = re.compile(pattern)
-            pruner.parse_by_trait_value(tree, trait, regex)
+            for trait_pattern in options.where_trait:
+                trait, pattern = trait_pattern.split("=")
+                regex = re.compile(pattern)
+                pruner.parse_by_trait_value(tree, trait, regex)
 
         pruner.prune(tree)
 
@@ -32,10 +33,10 @@ def run(options):
         values = [tip.annotations.get_value(options.trait) for tip in tree.leaf_node_iter() if
                   tip.annotations.get_value(options.trait) is not None]
 
-        print(values)
         for value in values:
             pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), options.extract)
             copy_tree = copy.deepcopy(tree)
             regex = re.compile(value)
             pruner.parse_by_trait_value(copy_tree, options.trait, regex)
+            pruner.prune(copy_tree)
             copy_tree.write(path=options.output + "/" + options.trait + "_" + value + ".tree", schema="nexus")
