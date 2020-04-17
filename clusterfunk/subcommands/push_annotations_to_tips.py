@@ -1,7 +1,7 @@
 import csv
 import re
 
-from clusterfunk.annotate_tree import TreeAnnotator, get_annotations, push_trait_to_tips
+from clusterfunk.annotate_tree import TreeAnnotator, push_trait_to_tips
 from clusterfunk.utils import prepare_tree
 
 
@@ -13,11 +13,11 @@ def run(options):
         return True
 
     if options.stop_where_trait is not None:
-        key, regex = options.filter.split("=")
+        key, regex = options.stop_where_trait.split("=")
         matcher = re.compile(regex)
 
         def predicate(node):
-            return True if matcher.match(node.annotations.get_value(key)) else False
+            return True if matcher.match(str(node.annotations.get_value(key))) else False
 
     for trait_name in options.traits:
         #         get values or traits

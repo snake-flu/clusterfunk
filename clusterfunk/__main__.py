@@ -198,7 +198,7 @@ def main(args=None):
 
     # _____________________________ push annotations to tips ______________________________#
     subparser_push_annotations_to_tips = subparsers.add_parser(
-            "annotate_tips_from_nodes",
+            "push_annotations_to_tips",
             usage="clusterfunk annotate_tips_from_nodes  --traits country -i my.tree -o my.annotated.tree ",
             help="This funk pushes annotations to tips. It identifies the  mrca of nodes with each value of the trait"
                  " provided and pushes the annotation up to any descendent tip",
