@@ -37,7 +37,7 @@ Available subcommands:
     ancestral_reconstruction
                         Reconstructs ancestral states on internal nodes using
                         Fitch parsimony algorithm
-    annotate_tips_from_nodes
+    push_annotations_to_tips
                         This funk pushes annotations to tips. It identifies
                         the mrca of nodes with each value of the trait
                         provided and pushes the annotation up to any
