@@ -47,8 +47,7 @@ class TreeAnnotator:
             trait = {}
             value_match = regex.match(tip.taxon.label)
             if value_match is None:
-                warnings.warn("taxon name %s in tree does not match annotation regex pattern" % tip.taxon.label)
-                value = None
+                raise ValueError("taxon name %s in tree does not match annotation regex pattern" % tip.taxon.label)
             else:
                 value = "".join(value_match.groups())
             trait[trait_name] = value if len(value) > 0 or value is None else None
@@ -57,7 +56,6 @@ class TreeAnnotator:
         self.annotate_tips(annotations)
 
     def add_boolean_trait(self, trait, boolean_trait_name, regex):
-
         for node in self.tree.postorder_node_iter():
             self.add_boolean(node, trait, boolean_trait_name, regex)
 
