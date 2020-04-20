@@ -88,13 +88,19 @@ def main(args=None):
     )
 
     subparser_annotate.add_argument(
-            '--where-trait',
-            dest="where_trait",
+            '--boolean-for-trait',
+            dest="boolean_for_trait",
             metavar="<trait>_<qualifier>=<regex>",
             nargs="+",
             help=" A boolean annotation will be added for each node "
-                 "with the new trait specifying whether the annotation <trait> not it matches this value. the new trait will be called "
-                 "<trait>_<qualifier>")
+                 "with the new trait specifying whether the annotation <trait> not it matches this value.")
+
+    subparser_annotate.add_argument(
+            '--boolean-trait-names',
+            dest="boolean_trait_names",
+            metavar="<trait_name>",
+            nargs="+",
+            help=" A names of the boolean annotations added by boolean-for-trait option in order.")
 
     subparser_annotate.add_argument(
             '-mrca',

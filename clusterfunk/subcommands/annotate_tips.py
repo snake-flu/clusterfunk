@@ -25,12 +25,13 @@ def run(options):
         for string in options.from_taxon:
             trait, regex = string.split("=")
             annotator.annotate_tips_from_label(trait, re.compile(regex))
-
-    if options.where_trait is not None:
-        for string in options.where_trait:
+    i = 0
+    if options.boolean_for_trait is not None:
+        for string in options.boolean_for_trait:
             boolean_trait_name, regex = string.split("=")
-            trait = boolean_trait_name.split("_")[0]
-            annotator.add_boolean_trait(trait, boolean_trait_name, re.compile(regex))
+            trait_name = options.boolean_trait_names[i] if len(
+                options.boolean_trait_names) > i else boolean_trait_name + "_boolean"
+            annotator.add_boolean_trait(trait_name, boolean_trait_name, re.compile(regex))
 
     if options.mrca is not None:
         for trait_name in options.mrca:
