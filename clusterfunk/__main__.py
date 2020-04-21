@@ -48,12 +48,12 @@ def main(args=None):
             dest='collapse',
             type=float,
             help='A optional flag to collapse branches with length <= the input before running the rule.')
-    # shared_arguments_parser.add_argument(
-    #         "-v",
-    #         "--verbose",
-    #         dest="verbose",
-    #         action='store_true',
-    #         default=False)
+    shared_arguments_parser.add_argument(
+            "-v",
+            "--verbose",
+            dest="verbose",
+            action='store_true',
+            default=False)
 
     subparsers = parser.add_subparsers(
             title="Available subcommands", help="", metavar=""
