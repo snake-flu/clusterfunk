@@ -23,6 +23,7 @@ def run(options):
         #         get values or traits
         values = list(set([node.annotations.get_value(trait_name) for node in
                            tree.leaf_node_iter(lambda tip: tip.annotations.get_value(trait_name) is not None)]))
+        values.sort()
         for value in values:
             mrca = annotator.annotate_mrca(trait_name, value)
             push_trait_to_tips(mrca, trait_name, value, predicate)
