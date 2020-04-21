@@ -3,7 +3,7 @@ import unittest
 
 import dendropy
 
-from clusterfunk.annotate_tree import TreeAnnotator, get_annotations
+from clusterfunk.annotate_tree import TreeAnnotator, get_annotations, push_trait_to_tips
 
 
 class AnnotationTest(unittest.TestCase):
@@ -48,6 +48,27 @@ class AnnotationTest(unittest.TestCase):
 
         self.annotator.add_boolean_trait("test", "test_1", re.compile("1"))
         self.assertEqual(self.tree.find_node_with_taxon_label("A|human").annotations.get_value("test_1"), True)
+
+
+    def test_push_annotations(self):
+        annotations = {"A|human": {"test": "yes"},
+                       "C|bat": {"test": "yes"}}
+        self.annotator.annotate_tips(annotations)
+        mrca = self.annotator.annotate_mrca("test", "yes")
+        push_trait_to_tips(mrca, "test", "yes", lambda node: True)
+        self.assertEqual(self.tree.find_node_with_taxon_label("B|camel").annotations.get_value("test"), "yes")
+
+    def test_push_annotations_with_predicate(self):
+        annotations = {"A|human": {"test": "yes"},
+                       "C|bat": {"test": "yes"}}
+        self.annotator.annotate_tips(annotations)
+        mrca = self.annotator.annotate_mrca("test", "yes")
+        A = self.tree.find_node_with_taxon_label('A|human')
+        push_trait_to_tips(mrca, "test", "yes", lambda node: A not in node.child_nodes())
+        self.assertIsNone(self.tree.find_node_with_taxon_label("B|camel").annotations.get_value("test"))
+        self.assertEqual(self.tree.find_node_with_taxon_label("D|").annotations.get_value("test"), "yes")
+
+
 
 
 if __name__ == '__main__':
