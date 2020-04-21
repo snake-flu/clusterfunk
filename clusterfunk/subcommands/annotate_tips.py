@@ -18,7 +18,7 @@ def run(options):
     if options.traits_file is not None:
         get_data_key = re.compile(options.parse_data)
 
-        with open(options.traits_file, "r", encoding="utf-8-sig") as metadata:
+        with open(options.traits_file, "r") as metadata:
             dialect = csv.Sniffer().sniff(metadata.readline())
             metadata.seek(0)
             reader = csv.DictReader(metadata, dialect=dialect)
