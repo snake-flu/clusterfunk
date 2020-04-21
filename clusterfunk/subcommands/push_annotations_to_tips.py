@@ -17,7 +17,7 @@ def run(options):
         matcher = re.compile(regex)
 
         def predicate(node):
-            return True if matcher.match(str(node.annotations.get_value(key))) else False
+            return False if matcher.match(str(node.annotations.get_value(key))) else True
 
     for trait_name in options.traits:
         #         get values or traits
