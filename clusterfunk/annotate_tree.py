@@ -12,7 +12,8 @@ def push_trait_to_tips(node, trait_name, value, predicate=lambda x: True):
             n.annotations.add_bound_attribute(trait_name)
 
     traverse_and_annotate = TraversalAction(predicate, action)
-    traverse_and_annotate.run(node)
+    if predicate(node):
+        traverse_and_annotate.run(node)
 
 
 class TraversalAction:

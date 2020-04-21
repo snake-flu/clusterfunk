@@ -43,25 +43,17 @@ def main(args=None):
             help='what format is the tree file. This is passed to dendropy. default is \'nexus\'')
 
     shared_arguments_parser.add_argument(
-            '--csv-encoding',
-            dest='csv_encoding',
-            action='store',
-            default="nexus",
-            choices=['nexus', 'newick', 'nexml'],
-            help='what format is the tree file. This is passed to dendropy. default is \'nexus\'')
-
-    shared_arguments_parser.add_argument(
             "-c",
             "--collapse_to_polytomies",
             dest='collapse',
             type=float,
             help='A optional flag to collapse branches with length <= the input before running the rule.')
-    shared_arguments_parser.add_argument(
-            "-v",
-            "--verbose",
-            dest="verbose",
-            action='store_true',
-            default=False)
+    # shared_arguments_parser.add_argument(
+    #         "-v",
+    #         "--verbose",
+    #         dest="verbose",
+    #         action='store_true',
+    #         default=False)
 
     subparsers = parser.add_subparsers(
             title="Available subcommands", help="", metavar=""
@@ -417,7 +409,7 @@ def main(args=None):
     )
 
     subparser_gaft.add_argument(
-            "--scion",
+            "--scions",
             required=True,
             nargs="+",
             help="The incoming trees that will be grafted onto the input tree"
