@@ -12,7 +12,8 @@ def push_trait_to_tips(node, trait_name, value, predicate=lambda x: True):
             n.annotations.add_bound_attribute(trait_name)
 
     traverse_and_annotate = TraversalAction(predicate, action)
-    traverse_and_annotate.run(node)
+    if predicate(node):
+        traverse_and_annotate.run(node)
 
 
 class TraversalAction:
@@ -24,7 +25,7 @@ class TraversalAction:
         for child in node.child_node_iter():
             if self.predicate(child):
                 self.action(child)
-                self.run(node)
+                self.run(child)
 
 
 class TreeAnnotator:
@@ -85,7 +86,7 @@ class TreeAnnotator:
     def annotate_node(self, tip_label, annotations):
 
         node = self.tree.find_node_with_taxon(
-                lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
+            lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
         if node is None:
             warnings.warn("Taxon: %s not found in tree" % tip_label, UserWarning)
         else:
@@ -145,13 +146,13 @@ class TreeAnnotator:
 
     def reconstruct_ancestors(self, node, parent_states, acctran, name):
         node_states = node.annotations.get_value(name) if isinstance(node.annotations.get_value(name), list) else [
-                node.annotations.get_value(name)]
+            node.annotations.get_value(name)]
 
         if node.is_leaf() and len(node_states) == 1 and node_states[0] is not None:
             assigned_states = node_states
         else:
             assigned_states = list(set(node_states).intersection(parent_states)) if len(
-                    set(node_states).intersection(parent_states)) > 0 else list(set(node_states).union(parent_states))
+                set(node_states).intersection(parent_states)) > 0 else list(set(node_states).union(parent_states))
 
         if len(assigned_states) > 1:
             if acctran:
@@ -162,12 +163,12 @@ class TreeAnnotator:
                 for child in node.child_node_iter():
                     child_states += child.annotations.get_value(name) if isinstance(child.annotations.get_value(name),
                                                                                     list) else [
-                            child.annotations.get_value(name)]
+                        child.annotations.get_value(name)]
 
                 assigned_states = [state for state in assigned_states if
                                    state in parent_states and state in child_states] if len(
-                        set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
-                                                                                 state in child_states]
+                    set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
+                                                                             state in child_states]
 
         setattr(node, name, assigned_states[0] if len(assigned_states) == 1 else assigned_states)
 
