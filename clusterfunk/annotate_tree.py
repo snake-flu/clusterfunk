@@ -101,8 +101,13 @@ class TreeAnnotator:
                      self.tree.leaf_node_iter(lambda node: node.annotations.get_value(trait_name) == value)]
         mrca = self.tree.mrca(taxa=taxon_set)
 
-        setattr(mrca, "%s-mrca" % trait_name, value)
-        mrca.annotations.add_bound_attribute("%s-mrca" % trait_name)
+        current_annotation = mrca.annotations.get_value("%s-mrca" % trait_name)
+        if current_annotation is not None:
+            print("common mrca concatenating %s and %s" % (current_annotation, value))
+            setattr(mrca, "%s-mrca" % trait_name, current_annotation + "-" + value)
+        else:
+            setattr(mrca, "%s-mrca" % trait_name, value)
+            mrca.annotations.add_bound_attribute("%s-mrca" % trait_name)
         return mrca
 
     def fitch_parsimony(self, node, name):

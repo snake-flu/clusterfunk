@@ -1,5 +1,6 @@
 import re
 import warnings
+import chardet
 
 from clusterfunk.annotate_tree import *
 import csv
@@ -17,8 +18,10 @@ def run(options):
 
     if options.traits_file is not None:
         get_data_key = re.compile(options.parse_data)
+        rawdata = open(options.traits_file, "rb").read()
+        result = chardet.detect(rawdata)
 
-        with open(options.traits_file, "r") as metadata:
+        with open(options.traits_file, encoding=result['encoding']) as metadata:
             dialect = csv.Sniffer().sniff(metadata.readline())
             metadata.seek(0)
             reader = csv.DictReader(metadata, dialect=dialect)
@@ -42,7 +45,7 @@ def run(options):
             #         get values of traits
             values = list(set([node.annotations.get_value(trait_name) for node in
                                tree.leaf_node_iter(lambda tip: tip.annotations.get_value(trait_name) is not None)]))
-
+            values.sort()
             for value in values:
                 annotator.annotate_mrca(trait_name, value)
 

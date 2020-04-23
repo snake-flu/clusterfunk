@@ -25,7 +25,9 @@ def run(options):
                            tree.leaf_node_iter(lambda tip: tip.annotations.get_value(trait_name) is not None)]))
         values.sort()
         for value in values:
-            mrca = annotator.annotate_mrca(trait_name, value)
+            taxon_set = [tip.taxon for tip in
+                         tree.tree.leaf_node_iter(lambda node: node.annotations.get_value(trait_name) == value)]
+            mrca = tree.mrca(taxa=taxon_set)
             push_trait_to_tips(mrca, trait_name, value, predicate)
 
     tree.write(path=options.output, schema="nexus")

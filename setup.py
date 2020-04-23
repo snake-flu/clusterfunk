@@ -11,7 +11,8 @@ setup(
         tests_require=["nose >= 1.3"],
         install_requires=[
                 "biopython>=1.70",
-                "dendropy>=4.4.0"
+                "dendropy>=4.4.0",
+                "chardet>=3.0.4"
         ],
     classifiers=[
         "Development Status :: 4 - Beta",
