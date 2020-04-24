@@ -26,7 +26,7 @@ def run(options):
         values.sort()
         for value in values:
             taxon_set = [tip.taxon for tip in
-                         tree.tree.leaf_node_iter(lambda node: node.annotations.get_value(trait_name) == value)]
+                         tree.leaf_node_iter(lambda node: node.annotations.get_value(trait_name) == value)]
             mrca = tree.mrca(taxa=taxon_set)
             push_trait_to_tips(mrca, trait_name, value, predicate)
 
