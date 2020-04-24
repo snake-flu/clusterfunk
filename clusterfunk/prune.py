@@ -1,6 +1,7 @@
 import csv
 import re
 
+import chardet
 from Bio import SeqIO
 
 
@@ -35,7 +36,9 @@ class TreePruner:
                 self.taxon_set.append(taxon_label)
 
     def parse_metadata(self, file, index_column):
-        with open(file, newline='') as metadata_file:
+        rawdata = open(file, "rb").read()
+        result = chardet.detect(rawdata)
+        with open(file, encoding=result['encoding']) as metadata_file:
             dialect = csv.Sniffer().sniff(metadata_file.readline())
             metadata_file.seek(0)
             reader = csv.DictReader(metadata_file, dialect=dialect)
