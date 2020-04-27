@@ -11,6 +11,7 @@ true_taxon_set = ["virus1||B.1|country|admin1|admin0|date", "virus3||B.1|country
 
 
 class Prune_tests(unittest.TestCase):
+
     def test_fasta_parse(self):
         file = "%s/taxon.fasta" % data_dir
         taxon_set = parse_taxon_set(file, "fasta")
