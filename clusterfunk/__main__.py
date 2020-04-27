@@ -395,6 +395,14 @@ def main(args=None):
             help="Boolean flag to extract and return the subtree defined by the taxa"
     )
 
+    subparser_prune.add_argument(
+        "-t", "--threads",
+        dest="threads",
+        type=int,
+        default=1,
+        help="Number of threads to parallelize over"
+    )
+
     subparser_prune.set_defaults(func=clusterfunk.subcommands.prune.run)
 
     # _____________________________ graft ______________________________#
