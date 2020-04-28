@@ -8,9 +8,9 @@ from clusterfunk.label_transitions import TransitionAnnotator
 class TransitionTest(unittest.TestCase):
     def setUp(self):
         self.tree = dendropy.Tree.get(
-            data="((watch_out_polytomy[&country=The_Shire],A|human[&country=UK]:1,(B|camel[&country=US]:1,(G[&country=UK]:1,F[&country=US]:2)[&country=US])[&country=US]:1,H[&country=UK]:1)[&country=UK]:3,"
-                 "C|bat[&country=UK]:4)[&country=China];", schema="newick")
-        self.transition_annotator = TransitionAnnotator("country", False, "introduction")
+                data="((watch_out_polytomy[&country=The_Shire],A|human[&country=UK]:1,(B|camel[&country=US]:1,(G[&country=UK]:1,F[&country=US]:2)[&country=US])[&country=US]:1,H[&country=UK]:1)[&country=UK]:3,"
+                     "C|bat[&country=UK]:4)[&country=China];", schema="newick")
+        self.transition_annotator = TransitionAnnotator("country", False, "introduction", "introduction")
 
     def test_transitions_from(self):
         count = self.transition_annotator.annotate_transitions(self.tree, From="China")

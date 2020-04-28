@@ -314,14 +314,23 @@ def main(args=None):
             dest='exploded_trees',
             action='store_true',
             default=False,
-            help='A boolean flag to output a nexus for each transition. In this case the ouput argument is treated as a directory and made if it doesn\'t exist')
+            help='A boolean flag to output a nexus for each transition. In this case the ouput argument is treated as '
+                 'a directory and made if it doesn\'t exist')
 
     subparser_label_transitions.add_argument(
             "--include_parent",
             dest='include_parent',
             action='store_true',
             default=False,
-            help='A boolean flag to inlcude transition parent node in exploded trees')
+            help='A boolean flag to include transition parent node in exploded trees')
+
+    subparser_label_transitions.add_argument(
+            "--include_root",
+            dest='include_root',
+            action='store_true',
+            default=False,
+            help='A boolean flag that when used with --to will count the root node as the first transition if it is '
+                 'annotated with the --to value')
 
     subparser_label_transitions.set_defaults(func=clusterfunk.subcommands.label_transitions.run)
 

@@ -2,7 +2,7 @@ import dendropy
 
 
 class TransitionAnnotator:
-    def __init__(self, trait, include_parent, transition_name, transition_suffix):
+    def __init__(self, trait, include_parent, transition_name, transition_suffix="", include_root=False):
 
         self.trait = trait
         self.From = None
@@ -12,6 +12,7 @@ class TransitionAnnotator:
         self.include_parent = include_parent
         self.found_transition = False
         self.transition_suffix = transition_suffix
+        self.include_root = include_root
 
         self.transition_name = transition_name
 
@@ -64,6 +65,15 @@ class TransitionAnnotator:
                         self.count += 1
                         setattr(node, self.transition_name, self.transition_suffix + str(self.count))
                         node.annotations.add_bound_attribute(self.transition_name)
+        # this is the root
+        else:
+            if self.to is not None:
+                if node_state == self.to and self.include_root:
+                    self.transition_points.append(node)
+                    self.count += 1
+                    setattr(node, self.transition_name, self.transition_suffix + str(self.count))
+                    node.annotations.add_bound_attribute(self.transition_name)
+
         for child in node.child_node_iter():
             self.traverse(child)
 
