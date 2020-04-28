@@ -162,6 +162,74 @@ def main(args=None):
             help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
     subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tips.run)
+    # _____________________________ rename tips ______________________________#
+    subparser_relabel = subparsers.add_parser(
+            "relabel_tips",
+            usage="clusterfunk relabel_tips  --input my.tree --output my.annotated.tree ",
+            help="relabels the tips of tree. Can relable tips from a csv/tsv and/or annotations labels",
+            parents=[shared_arguments_parser]
+    )
+
+    subparser_relabel.add_argument(
+            "--separator",
+            type=str,
+            help="separate feilds in name"
+    )
+
+    subparser_relabel.add_argument(
+            "--replace",
+            action="store_true",
+            default=False,
+            help="replace tip label instead of appending to it, default is False"
+    )
+
+    from_annotations_group = subparser_relabel.add_argument_group("Annotating from taxon labels")
+    from_metadata = subparser_relabel.add_argument_group("Annotation from metadata file")
+
+    from_annotations_group.add_argument(
+            "--from-traits",
+            nargs="+",
+            dest="from_traits",
+            metavar="<[traits]>",
+            help="Space separated list of traits."
+    )
+
+    from_metadata.add_argument(
+            '--in-metadata',
+            dest='traits_file',
+            action='store',
+            type=str,
+            help='optional csv file with tip annotations')
+    from_metadata.add_argument(
+            "--trait-columns",
+            dest="trait_columns",
+            type=str,
+            nargs="+",
+            help='Space separated list of columns to annotate on tree')
+
+    from_metadata.add_argument(
+            '--index-column',
+            dest="index_column",
+            default="taxon",
+            help="What column in the csv should be used to match the tip names."
+    )
+
+    from_metadata.add_argument(
+            "--parse-data-key",
+            dest="parse_data",
+            metavar="<regex>",
+            default="(.*)",
+            help="regex defined group(s) to construct keys from the data file to match the taxon labels"
+    )
+    from_metadata.add_argument(
+            "--parse-taxon-key",
+            dest="parse_taxon",
+            metavar="<regex>",
+            default="(.*)",
+            help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
+    )
+    subparser_relabel.set_defaults(func=clusterfunk.subcommands.relabel_tips.run)
+
     # _____________________________ Ancestral reconstruction ______________________________#
 
     subparser_ancestral_reconstruction = subparsers.add_parser(
