@@ -39,6 +39,7 @@ def run(options):
             boolean_trait_name = options.boolean_trait_names[i] if len(
                     options.boolean_trait_names) > i else trait_name + "_boolean"
             annotator.add_boolean_trait(trait_name, boolean_trait_name, re.compile(regex))
+            i += 1
 
     if options.mrca is not None:
         for trait_name in options.mrca:
