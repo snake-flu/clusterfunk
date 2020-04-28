@@ -1,6 +1,7 @@
 import copy
 import os
 import re
+from collections import Counter
 from multiprocessing.pool import ThreadPool
 from functools import partial
 
@@ -16,6 +17,7 @@ def prune_lineage(value, options):
     pruner.prune(tree_to_prune)
     tree_to_prune.write(path=options.output + "/" + options.trait + "_" + value + ".tree", schema="nexus")
     return value
+
 
 def run(options):
     tree = prepare_tree(options, options.input)
@@ -41,10 +43,11 @@ def run(options):
         if not os.path.exists(options.output):
             os.makedirs(options.output)
 
-        values = list(set([tip.annotations.get_value(options.trait) for tip in tree.leaf_node_iter() if
-                           tip.annotations.get_value(options.trait) is not None]))
+        values = Counter([tip.annotations.get_value(options.trait) for tip in tree.leaf_node_iter() if
+                          tip.annotations.get_value(options.trait) is not None])
+
+        no_singletons = [element for element, count in values.items() if count > 1]
         prune_func = partial(prune_lineage, options=options)
         results = []
         with ThreadPool(options.threads) as pool:
-            results.extend(pool.map(prune_func, values))
-
+            results.extend(pool.map(prune_func, no_singletons))
