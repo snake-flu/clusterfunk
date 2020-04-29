@@ -62,3 +62,15 @@ Available subcommands:
                         removed. All incoming trees must be in the same format
                         [nexus,newick,ect.]
 ```
+
+## Examples
+
+Annotate the tips of a tree using fields from a CSV file. It will use 'sequence_name' column in the CSV to match the tips of the tree and then add the data from the columns specified by `--trait-columns` to each tip using the NEXUS metacomment format.
+```
+clusterfunk annotate_tips --in-metadata <master.metadata.csv> --index-column sequence_name --trait-columns <trait1 trait1 ...> -  --input <input.tree> --output <output.tree>
+```
+
+Same as above but adds the metadata fields to the taxon labels of the tree.
+```
+clusterfunk relabel_tips --in-metadata <master.metadata.csv> --index-column sequence_name --trait-columns <trait1 trait1 ...>  --input <input.tree> --output <output.tree>
+```
