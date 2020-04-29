@@ -35,6 +35,9 @@ class TreePruner:
                 taxon_label = self.parse_data_taxon(line.strip())
                 self.taxon_set.append(taxon_label)
 
+    def set_taxon_set(self, ts):
+        self.taxon_set = ts
+
     def parse_metadata(self, file, index_column):
         rawdata = open(file, "rb").read()
         result = chardet.detect(rawdata)
@@ -56,6 +59,7 @@ class TreePruner:
     def prune(self, tree):
         taxa_labels = [tip.taxon.label for tip in tree.leaf_node_iter() if
                        self.parse_tree_taxon(tip.taxon.label) in self.taxon_set]
+        tips = [tip.taxon.label for tip in tree.leaf_node_iter()]
         if self.extract:
             tree.retain_taxa_with_labels(taxa_labels)
         else:
