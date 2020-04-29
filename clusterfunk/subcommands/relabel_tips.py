@@ -1,6 +1,7 @@
 import csv
 import re
 import sys
+import warnings
 
 import chardet
 
@@ -9,8 +10,10 @@ from clusterfunk.utils import prepare_tree
 
 
 def run(options):
+    if not options.verbose:
+        warnings.filterwarnings("ignore")
     tree = prepare_tree(options)
-    relabeler = TipLabeler(tree, options.parse_taxon, options.separator, options.replace)
+    relabeler = TipLabeler(tree, re.compile(options.parse_taxon), options.separator, options.replace)
     if options.traits_file is not None:
         get_data_key = re.compile(options.parse_data)
         rawdata = open(options.traits_file, "rb").read()

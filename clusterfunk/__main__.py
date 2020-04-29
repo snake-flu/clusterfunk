@@ -173,6 +173,7 @@ def main(args=None):
     subparser_relabel.add_argument(
             "--separator",
             type=str,
+            default="|",
             help="separate feilds in name"
     )
 
@@ -183,8 +184,8 @@ def main(args=None):
             help="replace tip label instead of appending to it, default is False"
     )
 
-    from_annotations_group = subparser_relabel.add_argument_group("Annotating from taxon labels")
-    from_metadata = subparser_relabel.add_argument_group("Annotation from metadata file")
+    from_annotations_group = subparser_relabel.add_argument_group("Renaming with annotations")
+    from_metadata = subparser_relabel.add_argument_group("Renaming from metadata file")
 
     from_annotations_group.add_argument(
             "--from-traits",
