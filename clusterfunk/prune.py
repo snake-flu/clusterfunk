@@ -59,7 +59,6 @@ class TreePruner:
     def prune(self, tree):
         taxa_labels = [tip.taxon.label for tip in tree.leaf_node_iter() if
                        self.parse_tree_taxon(tip.taxon.label) in self.taxon_set]
-        tips = [tip.taxon.label for tip in tree.leaf_node_iter()]
         if self.extract:
             tree.retain_taxa_with_labels(taxa_labels)
         else:

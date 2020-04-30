@@ -378,6 +378,14 @@ def main(args=None):
     )
 
     subparser_label_transitions.add_argument(
+            "--maxtrans",
+            dest='maxtrans',
+            action='store_true',
+            default=False,
+            help='A boolean flag to start a transition at the parent if the parent is a polytomy and has multiple '
+                 'children that would each start a transition of their own.')
+
+    subparser_label_transitions.add_argument(
             "-e",
             "--exploded_trees",
             dest='exploded_trees',

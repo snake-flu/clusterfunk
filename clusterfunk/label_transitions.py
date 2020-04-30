@@ -2,7 +2,8 @@ import dendropy
 
 
 class TransitionAnnotator:
-    def __init__(self, trait, include_parent, transition_name, transition_suffix="", include_root=False):
+    def __init__(self, trait, include_parent, transition_name, transition_suffix="", include_root=False,
+                 maxtrans=False):
 
         self.trait = trait
         self.From = None
@@ -13,6 +14,7 @@ class TransitionAnnotator:
         self.found_transition = False
         self.transition_suffix = transition_suffix
         self.include_root = include_root
+        self.maxtrans = maxtrans
 
         self.transition_name = transition_name
 
@@ -20,6 +22,9 @@ class TransitionAnnotator:
 
         if From is None and to is None:
             raise ValueError("Must provide at least a from or to state")
+
+        if From is not None and self.maxtrans:
+            raise ValueError("maxtrans not implemented for use with from")
 
         self.From = From
         self.to = to
@@ -60,19 +65,47 @@ class TransitionAnnotator:
                         setattr(node, self.transition_name,
                                 node.parent_node.annotations.get_value(self.transition_name))
                         node.annotations.add_bound_attribute(self.transition_name)
+                    elif self.maxtrans and node.parent_node.annotations.get_value(self.transition_name) is not None:
+                        setattr(node, self.transition_name,
+                                node.parent_node.annotations.get_value(self.transition_name))
+                        node.annotations.add_bound_attribute(self.transition_name)
+
                     else:
                         self.transition_points.append(node)
                         self.count += 1
                         setattr(node, self.transition_name, self.transition_suffix + str(self.count))
                         node.annotations.add_bound_attribute(self.transition_name)
+
+                elif self.maxtrans and node.num_child_nodes() > 2:
+                    children_at_to = 0
+                    for child in node.child_node_iter():
+                        if child.annotations.get_value(self.trait) == self.to:
+                            children_at_to += 1
+                    if children_at_to > 1:
+                        self.transition_points.append(node)
+                        self.count += 1
+                        setattr(node, self.transition_name, self.transition_suffix + str(self.count))
+                        node.annotations.add_bound_attribute(self.transition_name)
+
         # this is the root
         else:
             if self.to is not None:
-                if node_state == self.to and self.include_root:
-                    self.transition_points.append(node)
-                    self.count += 1
-                    setattr(node, self.transition_name, self.transition_suffix + str(self.count))
-                    node.annotations.add_bound_attribute(self.transition_name)
+                if self.include_root:
+                    if node_state == self.to:
+                        self.transition_points.append(node)
+                        self.count += 1
+                        setattr(node, self.transition_name, self.transition_suffix + str(self.count))
+                        node.annotations.add_bound_attribute(self.transition_name)
+                    elif self.maxtrans:
+                        children_at_to = 0
+                        for child in node.child_node_iter():
+                            if child.annotations.get_value(self.trait) == self.to:
+                                children_at_to += 1
+                        if children_at_to > 1:
+                            self.transition_points.append(node)
+                            self.count += 1
+                            setattr(node, self.transition_name, self.transition_suffix + str(self.count))
+                            node.annotations.add_bound_attribute(self.transition_name)
 
         for child in node.child_node_iter():
             self.traverse(child)
