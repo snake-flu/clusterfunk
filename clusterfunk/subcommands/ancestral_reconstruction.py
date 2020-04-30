@@ -7,15 +7,16 @@ def run(options):
 
     annotator = TreeAnnotator(tree)
 
-    acctran = True if options.acctran else False
+    acctran = True if (options.acctran or options.maxtran is not None) else False
 
     if len(options.traits) > 0:
         i = 0
         for trait in options.traits:
             ancestral_state = check_str_for_bool(options.ancestral_state[i]) if len(
                     options.ancestral_state) > i else None
+            maxtran = options.maxtran[i] if len(options.maxtran) > i else None
 
-            annotator.annotate_nodes_from_tips(trait, acctran, ancestral_state)
+            annotator.annotate_nodes_from_tips(trait, acctran, ancestral_state, maxtran)
             i += 1
 
     tree.write(path=options.output, schema="nexus")

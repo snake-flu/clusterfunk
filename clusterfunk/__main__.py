@@ -235,7 +235,7 @@ def main(args=None):
 
     subparser_ancestral_reconstruction = subparsers.add_parser(
             "ancestral_reconstruction",
-            usage="clusterfunk ancestral_reconstruction --acctran/--deltran [--ancestral_state] [--majority_rule] "
+            usage="clusterfunk ancestral_reconstruction --acctran/--deltran/--maxtran [--ancestral_state] [--majority_rule] "
                   "--traits country -i my.tree -o my.annotated.tree ",
             help="Reconstructs ancestral states on internal nodes using Fitch parsimony algorithm",
             parents=[shared_arguments_parser]
@@ -256,6 +256,15 @@ def main(args=None):
             dest='deltran',
             action='store_true',
             help="Boolean flag to use deltran reconstruction")
+
+    reconstruction_options.add_argument(
+            '--maxtran-with-value',
+            dest='maxtran',
+            metavar="<values>",
+            nargs="+",
+            help="use acctran except at polytomy if multiple children have <value> then the polytomy "
+                 "node is included. values are in the same order as traits")
+
     subparser_ancestral_reconstruction.add_argument(
             "--traits",
             nargs="+",
@@ -377,13 +386,6 @@ def main(args=None):
             help='prefix for each transition value'
     )
 
-    subparser_label_transitions.add_argument(
-            "--maxtrans",
-            dest='maxtrans',
-            action='store_true',
-            default=False,
-            help='A boolean flag to start a transition at the parent if the parent is a polytomy and has multiple '
-                 'children that would each start a transition of their own.')
 
     subparser_label_transitions.add_argument(
             "-e",

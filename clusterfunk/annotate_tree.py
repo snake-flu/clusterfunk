@@ -73,20 +73,19 @@ class TreeAnnotator:
 
             node.annotations.add_bound_attribute(boolean_trait_name)
 
-    def annotate_nodes_from_tips(self, name, acctran, parent_state=None):
-        if parent_state is None:
-            parent_state = []
+    def annotate_nodes_from_tips(self, name, acctran, parent_state=None, maxtran_value=None):
+
         self.fitch_parsimony(self.root, name)
 
         if parent_state is None:
-            self.reconstruct_ancestors(self.root, [], acctran, name)
+            self.reconstruct_ancestors(self.root, [], acctran, name, maxtran_value)
         else:
-            self.reconstruct_ancestors(self.root, [parent_state], acctran, name)
+            self.reconstruct_ancestors(self.root, [parent_state], acctran, name, maxtran_value)
 
     def annotate_node(self, tip_label, annotations):
 
         node = self.tree.find_node_with_taxon(
-            lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
+                lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
         if node is None:
             warnings.warn("Taxon: %s not found in tree" % tip_label, UserWarning)
         else:
@@ -149,15 +148,23 @@ class TreeAnnotator:
 
         return value
 
-    def reconstruct_ancestors(self, node, parent_states, acctran, name):
+    def reconstruct_ancestors(self, node, parent_states, acctran, name, maxtran_value=None):
         node_states = node.annotations.get_value(name) if isinstance(node.annotations.get_value(name), list) else [
-            node.annotations.get_value(name)]
+                node.annotations.get_value(name)]
+
+        children_at_maxtran_value = 0
+        if maxtran_value is not None and node.num_child_nodes() > 2:
+            for child in node.child_node_iter():
+                if child.annotations.get_value(name) == maxtran_value:
+                    children_at_maxtran_value += 1
 
         if node.is_leaf() and len(node_states) == 1 and node_states[0] is not None:
             assigned_states = node_states
+        elif children_at_maxtran_value > 1:
+            assigned_states = maxtran_value
         else:
             assigned_states = list(set(node_states).intersection(parent_states)) if len(
-                set(node_states).intersection(parent_states)) > 0 else list(set(node_states).union(parent_states))
+                    set(node_states).intersection(parent_states)) > 0 else list(set(node_states).union(parent_states))
 
         if len(assigned_states) > 1:
             if acctran:
@@ -168,17 +175,17 @@ class TreeAnnotator:
                 for child in node.child_node_iter():
                     child_states += child.annotations.get_value(name) if isinstance(child.annotations.get_value(name),
                                                                                     list) else [
-                        child.annotations.get_value(name)]
+                            child.annotations.get_value(name)]
 
                 assigned_states = [state for state in assigned_states if
                                    state in parent_states and state in child_states] if len(
-                    set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
-                                                                             state in child_states]
+                        set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
+                                                                                 state in child_states]
 
         setattr(node, name, assigned_states[0] if len(assigned_states) == 1 else assigned_states)
 
         for child in node.child_node_iter():
-            self.reconstruct_ancestors(child, assigned_states, acctran, name)
+            self.reconstruct_ancestors(child, assigned_states, acctran, name, maxtran_value)
 
 
 def get_annotations(annotation_list, index_column, data_name_matcher, traits):

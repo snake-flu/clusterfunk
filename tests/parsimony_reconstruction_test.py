@@ -8,7 +8,6 @@ class TestFitch(unittest.TestCase):
         tree = dendropy.Tree.get_from_string("(A:1,(B:1,(C:1,(D:1,E:1):1):1):1);", "newick")
         self.PR = annotate_tree.TreeAnnotator(tree)
 
-
     def test_annotations(self):
         self.PR.annotate_node("A", {"UK": False})
         node = self.PR.tree.find_node_with_taxon(lambda taxon: True if taxon.label == "A" else False)
@@ -81,3 +80,17 @@ class TestFitch(unittest.TestCase):
         annotator = annotate_tree.TreeAnnotator(polytomy, True)
         annotator.fitch_parsimony(polytomy.seed_node, "t")
         self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "1")
+
+    def test_polytomy_maxtrans(self):
+        text = "(A[&t=2]:1,(B[&t=2]:1,(C[&t=2]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
+        polytomy = dendropy.Tree.get_from_string(text, "newick")
+        annotator = annotate_tree.TreeAnnotator(polytomy, True)
+        annotator.annotate_nodes_from_tips("t", True, "2", "1")
+        self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "1")
+
+    def test_polytomy_maxtrans_nogo(self):
+        text = "(A[&t=2]:1,(B[&t=2]:1,(C[&t=2]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
+        polytomy = dendropy.Tree.get_from_string(text, "newick")
+        annotator = annotate_tree.TreeAnnotator(polytomy, True)
+        annotator.annotate_nodes_from_tips("t", True, "2", "3")
+        self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "2")
