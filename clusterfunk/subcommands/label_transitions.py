@@ -9,8 +9,7 @@ def run(options):
                                     options.include_parent,
                                     options.transition_name,
                                     options.transition_prefix,
-                                    options.include_root,
-                                    options.maxtrans)
+                                    options.include_root)
 
     if options.exploded_trees:
         trees = annotator.split_at_transitions(tree,

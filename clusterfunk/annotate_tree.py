@@ -161,7 +161,7 @@ class TreeAnnotator:
         if node.is_leaf() and len(node_states) == 1 and node_states[0] is not None:
             assigned_states = node_states
         elif children_at_maxtran_value > 1:
-            assigned_states = maxtran_value
+            assigned_states = [maxtran_value]
         else:
             assigned_states = list(set(node_states).intersection(parent_states)) if len(
                     set(node_states).intersection(parent_states)) > 0 else list(set(node_states).union(parent_states))

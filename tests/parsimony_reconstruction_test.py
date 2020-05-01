@@ -1,6 +1,19 @@
+import os
 import unittest
 from clusterfunk import annotate_tree
 import dendropy
+
+from clusterfunk.utils import prepare_tree
+
+this_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+data_dir = os.path.join(this_dir, "tests", 'data', 'maxtrans')
+
+
+class Options:
+    def __init__(self):
+        self.input = "%s/test.tree" % data_dir
+        self.collapse = 5E-6
+        self.format = "nexus"
 
 
 class TestFitch(unittest.TestCase):
@@ -84,13 +97,19 @@ class TestFitch(unittest.TestCase):
     def test_polytomy_maxtrans(self):
         text = "(A[&t=2]:1,(B[&t=2]:1,(C[&t=2]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
         polytomy = dendropy.Tree.get_from_string(text, "newick")
-        annotator = annotate_tree.TreeAnnotator(polytomy, True)
+        annotator = annotate_tree.TreeAnnotator(polytomy, False)
         annotator.annotate_nodes_from_tips("t", True, "2", "1")
         self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "1")
 
     def test_polytomy_maxtrans_nogo(self):
         text = "(A[&t=2]:1,(B[&t=2]:1,(C[&t=2]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
         polytomy = dendropy.Tree.get_from_string(text, "newick")
-        annotator = annotate_tree.TreeAnnotator(polytomy, True)
+        annotator = annotate_tree.TreeAnnotator(polytomy, False)
         annotator.annotate_nodes_from_tips("t", True, "2", "3")
         self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "2")
+
+    def test_what_went_wrong(self):
+        maxtransOptions = Options()
+        tree = prepare_tree(maxtransOptions)
+        annotator = annotate_tree.TreeAnnotator(tree, False)
+        annotator.annotate_nodes_from_tips("country_uk_maxtran", True, "True", "False")

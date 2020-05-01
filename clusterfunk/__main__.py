@@ -512,7 +512,7 @@ def main(args=None):
     )
 
     subparser_gaft.add_argument(
-            "--full_graft",
+            "--full-graft",
             action="store_true",
             default=False,
             help="A boolean flag to remove any remaining original tips from the guide tree that were not found in any"
