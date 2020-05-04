@@ -11,7 +11,10 @@ def run(options):
         scion_tree = prepare_tree(options, path)
         if options.annotate_scions is not None:
             annotate_nodes(scion_tree, options.scion_annotation_name, options.annotate_scions[i])
-        root_stock.graft(scion_tree)
+        try:
+            root_stock.graft(scion_tree)
+        except KeyError as e:
+            raise Exception('No tips shared between guide tree and scion %s' % path).with_traceback(e.__traceback__)
         i += 1
 
     if options.full_graft:

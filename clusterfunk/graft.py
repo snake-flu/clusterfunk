@@ -13,6 +13,10 @@ class RootStock:
         incoming_tree_tips_labels = [tip.label for tip in incoming_tree_tips]
 
         shared_taxa = [tip for tip in tips if tip.label in incoming_tree_tips_labels]
+
+        if len(shared_taxa)==0:
+            raise KeyError("Didn't find any shared tips between the rootstock and scion")
+
         expectant_parent = self.tree.mrca(taxa=shared_taxa)
         added_node = expectant_parent.add_child(incoming_tree.seed_node)
         added_node.edge.collapse(adjust_collapsed_head_children_edge_lengths=True)
