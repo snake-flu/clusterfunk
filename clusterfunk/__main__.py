@@ -529,6 +529,12 @@ def main(args=None):
             default='scion_id',
             help="the annotation name to be used in annotation each scion. default: scion_id"
     )
+    subparser_gaft.add_argument(
+            "--iterative",
+            action="store_true",
+            default='False',
+            help="use the tree from the last graft as the input for the the next one."
+    )
     subparser_gaft.set_defaults(func=clusterfunk.subcommands.graft.run)
 
     args = parser.parse_args()
