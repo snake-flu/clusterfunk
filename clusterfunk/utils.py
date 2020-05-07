@@ -29,7 +29,7 @@ def collapse_nodes(tree, threshold):
 
 def prepare_tree(options, input_file_name=None):
     input_path = input_file_name if input_file_name is not None else options.input
-    tree = parse_tree(input_path, options.format)
+    tree = parse_tree(input_path, options.in_format)
     if options.collapse:
         collapse_nodes(tree, options.collapse)
     return tree

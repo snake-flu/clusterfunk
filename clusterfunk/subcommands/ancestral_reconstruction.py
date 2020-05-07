@@ -20,4 +20,4 @@ def run(options):
             annotator.annotate_nodes_from_tips(trait, acctran, ancestral_state, maxtran)
             i += 1
 
-    tree.write(path=options.output, schema="nexus")
+    tree.write(path=options.output, schema=options.out_format)

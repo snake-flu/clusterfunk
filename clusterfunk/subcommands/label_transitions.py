@@ -21,7 +21,7 @@ def run(options):
 
         i = 1
         for tree in trees:
-            tree["tree"].write(path=options.output + "/" + tree["id"] + '.tree', schema="nexus")
+            tree["tree"].write(path=options.output + "/" + tree["id"] + '.tree', schema=options.out_format)
             i += 1
 
     else:
@@ -29,4 +29,4 @@ def run(options):
                                                check_str_for_bool(options.From),
                                                check_str_for_bool(options.to))
         print(count)
-        tree.write(path=options.output, schema="nexus")
+        tree.write(path=options.output, schema=options.out_format)

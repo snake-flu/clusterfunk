@@ -30,4 +30,4 @@ def run(options):
             mrca = tree.mrca(taxa=taxon_set)
             push_trait_to_tips(mrca, trait_name, value, predicate)
 
-    tree.write(path=options.output, schema="nexus")
+    tree.write(path=options.output, schema=options.out_format)

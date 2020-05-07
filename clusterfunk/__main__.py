@@ -35,12 +35,21 @@ def main(args=None):
             help='The output file')
 
     shared_arguments_parser.add_argument(
-            '--format',
-            dest='format',
+            '--in-format',
+            dest='in_format',
             action='store',
             default="nexus",
             choices=['nexus', 'newick', 'nexml'],
             help='what format is the tree file. This is passed to dendropy. default is \'nexus\'')
+
+    shared_arguments_parser.add_argument(
+            '--out-format',
+            dest='out_format',
+            action='store',
+            default="nexus",
+            choices=['nexus', 'newick', 'nexml'],
+            help='what format is the tree file. This is passed to dendropy. default is \'nexus\'. Note newick trees '
+                 ' can not contain annotations')
 
     shared_arguments_parser.add_argument(
             "-c",

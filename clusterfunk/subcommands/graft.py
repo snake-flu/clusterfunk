@@ -20,7 +20,7 @@ def run(options):
     if options.full_graft:
         root_stock.remove_left_over_tips()
 
-    root_stock.tree.write(path=options.output, schema="nexus")
+    root_stock.tree.write(path=options.output, schema=options.out_format)
 
 
 def annotate_nodes(tree, trait_name, trait_value):

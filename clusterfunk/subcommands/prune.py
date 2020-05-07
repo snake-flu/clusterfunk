@@ -18,7 +18,7 @@ def prune_lineage(subtree, options):
     pruner.set_taxon_set([taxon.label for taxon in subtree["taxa"]])
     pruner.prune(tree_to_prune)
     tree_to_prune.write(path=options.output + "/" + options.trait + "_" + subtree["value"] + ".tree",
-                        schema="nexus")
+                        schema=options.out_format)
     return subtree["value"]
 
 
@@ -41,7 +41,7 @@ def run(options):
 
         pruner.prune(tree)
 
-        tree.write(path=options.output, schema="nexus")
+        tree.write(path=options.output, schema=options.out_format)
     else:
         if not os.path.exists(options.output):
             os.makedirs(options.output)

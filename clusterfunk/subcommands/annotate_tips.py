@@ -50,4 +50,4 @@ def run(options):
             for value in values:
                 annotator.annotate_mrca(trait_name, value)
 
-    tree.write(path=options.output, schema="nexus")
+    tree.write(path=options.output, schema=options.out_format)

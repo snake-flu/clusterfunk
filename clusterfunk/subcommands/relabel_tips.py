@@ -33,4 +33,4 @@ def run(options):
     else:
         sys.exit("No trait names or meta data provided. exiting")
 
-    tree.write(path=options.output, schema="nexus")
+    tree.write(path=options.output, schema=options.out_format)
