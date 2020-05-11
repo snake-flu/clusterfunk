@@ -6,7 +6,7 @@ import warnings
 import chardet
 
 from clusterfunk.relabel_tips import get_traits_from_metadata, TipLabeler
-from clusterfunk.utils import prepare_tree
+from clusterfunk.utils import prepare_tree, write_tree
 
 
 def run(options):
@@ -33,4 +33,4 @@ def run(options):
     else:
         sys.exit("No trait names or meta data provided. exiting")
 
-    tree.write(path=options.output, schema=options.out_format)
+    write_tree(tree, options)

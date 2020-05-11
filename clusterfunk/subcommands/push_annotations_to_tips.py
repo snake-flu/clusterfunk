@@ -2,7 +2,7 @@ import csv
 import re
 
 from clusterfunk.annotate_tree import TreeAnnotator, push_trait_to_tips
-from clusterfunk.utils import prepare_tree
+from clusterfunk.utils import prepare_tree, write_tree
 
 
 def run(options):
@@ -30,4 +30,4 @@ def run(options):
             mrca = tree.mrca(taxa=taxon_set)
             push_trait_to_tips(mrca, trait_name, value, predicate)
 
-    tree.write(path=options.output, schema=options.out_format)
+    write_tree(tree, options)

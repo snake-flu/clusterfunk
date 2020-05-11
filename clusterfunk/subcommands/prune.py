@@ -8,7 +8,7 @@ from functools import partial
 import dendropy
 
 from clusterfunk.prune import TreePruner
-from clusterfunk.utils import prepare_tree
+from clusterfunk.utils import prepare_tree, write_tree
 
 
 def prune_lineage(subtree, options):
@@ -17,8 +17,12 @@ def prune_lineage(subtree, options):
     pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), options.extract)
     pruner.set_taxon_set([taxon.label for taxon in subtree["taxa"]])
     pruner.prune(tree_to_prune)
-    tree_to_prune.write(path=options.output + "/" + options.trait + "_" + subtree["value"] + ".tree",
-                        schema=options.out_format)
+    if options.out_format == "newick":
+        tree_to_prune.write(path=options.output + "/" + options.trait + "_" + subtree["value"] + ".tree",
+                            schema=options.out_format, suppress_rooting=True)
+    else:
+        tree_to_prune.write(path=options.output + "/" + options.trait + "_" + subtree["value"] + ".tree",
+                            schema=options.out_format)
     return subtree["value"]
 
 
@@ -41,7 +45,7 @@ def run(options):
 
         pruner.prune(tree)
 
-        tree.write(path=options.output, schema=options.out_format)
+        write_tree(tree, options)
     else:
         if not os.path.exists(options.output):
             os.makedirs(options.output)

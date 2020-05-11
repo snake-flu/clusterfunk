@@ -1,6 +1,6 @@
 import os
 from clusterfunk.label_transitions import *
-from clusterfunk.utils import check_str_for_bool, prepare_tree
+from clusterfunk.utils import check_str_for_bool, prepare_tree, write_tree
 
 
 def run(options):
@@ -21,7 +21,12 @@ def run(options):
 
         i = 1
         for tree in trees:
-            tree["tree"].write(path=options.output + "/" + tree["id"] + '.tree', schema=options.out_format)
+            if options.out_format == "newick":
+                tree["tree"].write(path=options.output + "/" + tree["id"] + '.tree', schema=options.out_format,
+                                   suppress_rooting=True)
+            else:
+                tree["tree"].write(path=options.output + "/" + tree["id"] + '.tree', schema=options.out_format)
+
             i += 1
 
     else:
@@ -29,4 +34,4 @@ def run(options):
                                                check_str_for_bool(options.From),
                                                check_str_for_bool(options.to))
         print(count)
-        tree.write(path=options.output, schema=options.out_format)
+        write_tree(tree, options)

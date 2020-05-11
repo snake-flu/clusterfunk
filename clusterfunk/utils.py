@@ -16,8 +16,11 @@ def parse_tree(file, format):
     return dendropy.Tree.get(path=file, schema=format.lower(), preserve_underscores=True)
 
 
-def write_tree(tree, file, format):
-    tree.write(path=file, schema=format)
+def write_tree(tree, options):
+    if options.out_format == "newick":
+        tree.write(path=options.output, schema=options.out_format, suppress_rooting=True)
+    else:
+        tree.write(path=options.output, schema=options.out_format)
 
 
 def collapse_nodes(tree, threshold):
@@ -33,3 +36,9 @@ def prepare_tree(options, input_file_name=None):
     if options.collapse:
         collapse_nodes(tree, options.collapse)
     return tree
+
+
+class TreeHandler:
+    def __init__(self, options):
+        self.in_format = options.in_format
+        self.tree = prepare_tree(options)

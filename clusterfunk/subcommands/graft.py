@@ -1,5 +1,5 @@
 from clusterfunk.graft import RootStock
-from clusterfunk.utils import prepare_tree
+from clusterfunk.utils import prepare_tree, write_tree
 
 
 def run(options):
@@ -20,7 +20,7 @@ def run(options):
     if options.full_graft:
         root_stock.remove_left_over_tips()
 
-    root_stock.tree.write(path=options.output, schema=options.out_format)
+    write_tree(root_stock.tree, options)
 
 
 def annotate_nodes(tree, trait_name, trait_value):

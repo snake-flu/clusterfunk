@@ -5,7 +5,7 @@ import chardet
 from clusterfunk.annotate_tree import *
 import csv
 
-from clusterfunk.utils import prepare_tree
+from clusterfunk.utils import prepare_tree, write_tree
 
 
 def run(options):
@@ -50,4 +50,4 @@ def run(options):
             for value in values:
                 annotator.annotate_mrca(trait_name, value)
 
-    tree.write(path=options.output, schema=options.out_format)
+    write_tree(tree, options)
