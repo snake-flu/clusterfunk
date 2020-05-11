@@ -549,6 +549,21 @@ def main(args=None):
     )
     subparser_gaft.set_defaults(func=clusterfunk.subcommands.graft.run)
 
+    # ------------------------------reformat-----------------------------#
+    subparser_annotate_lineages = subparsers.add_parser(
+            "annotate_lineages",
+            usage="clusterfunk reformat -i my.guide.tree -o my.combined.tree --trait=lineage",
+            help="This function reformats a tree file",
+            parents=[shared_arguments_parser]
+    )
+    subparser_annotate_lineages.add_argument(
+            "--trait",
+            type=str,
+            default='lineage',
+            help="the annotation name to reconstruct"
+    )
+    subparser_annotate_lineages.set_defaults(func=clusterfunk.subcommands.annotate_lineages.run)
+
     args = parser.parse_args()
 
     if hasattr(args, "func"):
