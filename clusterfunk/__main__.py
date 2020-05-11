@@ -493,14 +493,23 @@ def main(args=None):
     )
 
     subparser_prune.add_argument(
-        "-t", "--threads",
-        dest="threads",
-        type=int,
-        default=1,
-        help="Number of threads to parallelize over"
+            "-t", "--threads",
+            dest="threads",
+            type=int,
+            default=1,
+            help="Number of threads to parallelize over"
     )
 
     subparser_prune.set_defaults(func=clusterfunk.subcommands.prune.run)
+
+    # ------------------------------reformat-----------------------------#
+    subparser_reformat = subparsers.add_parser(
+            "reformat",
+            usage="clusterfunk reformat -i my.guide.tree -o my.combined.tree --in-format nexus --out-format newick",
+            help="This function reformats a tree file",
+            parents=[shared_arguments_parser]
+    )
+    subparser_reformat.set_defaults(func=clusterfunk.subcommands.reformat.run)
 
     # _____________________________ graft ______________________________#
     subparser_gaft = subparsers.add_parser(
