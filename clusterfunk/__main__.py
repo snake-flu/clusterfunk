@@ -71,7 +71,6 @@ def main(args=None):
     # _____________________________ phylotype ______________________________#
     subparser_phylotype = subparsers.add_parser(
             "phylotype",
-            aliases=['phylotype_dat_tree'],
             usage="clusterfunk phylotype [--threshold] [---prefix] --inputmy.tree --output my.phylotyped.tree",
             help="Assigns phylotypes to a tree based on a branch length threshold",
             parents=[shared_arguments_parser]
@@ -96,7 +95,6 @@ def main(args=None):
     # _____________________________ tree annotator ______________________________#
     subparser_annotate = subparsers.add_parser(
             "annotate_tips",
-            aliases=['annotate_dat_tips'],
             usage="clusterfunk annotate  --input my.tree --output my.annotated.tree ",
             help="Annotates the tips of tree. Can annotate tips from a csv/tsv and/or taxon labels",
             parents=[shared_arguments_parser]
@@ -325,7 +323,6 @@ def main(args=None):
     # _____________________________ extract_tip_annotations ______________________________#
     subparser_extract_tip_annotations = subparsers.add_parser(
             "extract_tip_annotations",
-            aliases=['extract_dat_tree'],
             usage="clusterfunk extract_annotations --traits country -i my.annotated.tree -o annotations.csv",
             help="extracts annotations from tips in a tree and ouputs a csv",
             parents=[shared_arguments_parser]
@@ -346,7 +343,6 @@ def main(args=None):
 
     subparser_get_taxa = subparsers.add_parser(
             "get_taxa",
-            aliases=['get_dat_taxa'],
             usage="clusterfunk get_taxa  -i input.tree -o taxa.txt",
             help="extracts taxa labels from tips in a tree",
             parents=[shared_arguments_parser]
@@ -359,7 +355,6 @@ def main(args=None):
 
     subparser_label_transitions = subparsers.add_parser(
             "label_transitions",
-            aliases=['label_dat_transition'],
             usage="clusterfunk label_transitions --trait UK --from False --to True --transition_name introduction -i my.tree -o my.labeled.tree",
             help="counts and labels transitions of traits on a tree",
             parents=[shared_arguments_parser]
@@ -426,7 +421,6 @@ def main(args=None):
 
     subparser_prune = subparsers.add_parser(
             "prune",
-            aliases=['prune_dat_tree'],
             usage="clusterfunk prune --extract [--fasta file.fas] [--taxon taxon.set.txt] [--metadata metadata.csv/tsv --index-column taxon] [--where-trait <trait>=<regex> ] -i my.tree -o my.smaller.tree ",
             help="Prunes a tree either removing the specified taxa or keeping only those specified. "
                  "Taxa can be specified from a fasta file, text file, metadata file, or by an annotation.",
@@ -514,7 +508,6 @@ def main(args=None):
     # _____________________________ graft ______________________________#
     subparser_gaft = subparsers.add_parser(
             "graft",
-            aliases=['graft_dat_tree'],
             usage="clusterfunk graft --scion [trees1.tree tree2.tree] -i my.guide.tree -o my.combined.tree ",
             help="This function grafts trees (scions) onto a guide tree (input). The scion tree is grafted onto "
                  "the guide tree at the MRCA of the tips shared between the two. Any shared tips originally in the guide tree "
