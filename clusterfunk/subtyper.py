@@ -1,7 +1,9 @@
 import warnings
 
 from clusterfunk.annotate_tree import TreeAnnotator
+from clusterfunk.utils import SafeNodeAnnotator
 
+nodeAnnotator = SafeNodeAnnotator(safe=True)
 
 def check_all_the_same(l):
     currentCheck = ".".join(l[0])
@@ -38,8 +40,7 @@ class Subtyper:
         else:
             imputed_lineage = get_basal_lineage(child_lineages)
 
-        setattr(node, self.traitName, imputed_lineage)
-        node.annotations.add_bound_attribute(self.traitName)
+        nodeAnnotator.annotate(node, self.traitName, imputed_lineage)
 
         return imputed_lineage
 
@@ -54,8 +55,7 @@ class Subtyper:
         else:
             for a in annotations:
                 if a != "taxon":
-                    setattr(node, a, annotations[a])
-                    node.annotations.add_bound_attribute(a)
+                    nodeAnnotator.annotate(node, a, annotations[a])
 
 
 def all_equal(lineage_list):

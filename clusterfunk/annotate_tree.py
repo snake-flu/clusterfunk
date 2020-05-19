@@ -2,14 +2,15 @@ import re
 import warnings
 from collections import Counter
 
-from clusterfunk.utils import check_str_for_bool
+from clusterfunk.utils import check_str_for_bool, SafeNodeAnnotator
+
+nodeAnnotator = SafeNodeAnnotator(safe=True)
 
 
 def push_trait_to_tips(node, trait_name, value, predicate=lambda x: True):
     def action(n):
         if n.is_leaf():
-            setattr(n, trait_name, value)
-            n.annotations.add_bound_attribute(trait_name)
+            nodeAnnotator.annotate(n, trait_name, value)
 
     traverse_and_annotate = TraversalAction(predicate, action)
     if predicate(node):
@@ -65,13 +66,12 @@ class TreeAnnotator:
             self.annotate_node(tip_label, annotations[tip_label])
 
     def add_boolean(self, node, trait, boolean_trait_name, regex):
+
         if node.annotations.get_value(trait) is not None:
             if regex.match(str(node.annotations.get_value(trait))):
-                setattr(node, boolean_trait_name, True)
+                nodeAnnotator.annotate(node, boolean_trait_name, True)
             else:
-                setattr(node, boolean_trait_name, False)
-
-            node.annotations.add_bound_attribute(boolean_trait_name)
+                nodeAnnotator.annotate(node, boolean_trait_name, False)
 
     def annotate_nodes_from_tips(self, name, acctran, parent_state=None, maxtran_value=None):
 
@@ -92,8 +92,7 @@ class TreeAnnotator:
             for a in annotations:
                 if annotations[a] and (type(annotations[a]) is str and len(annotations[a]) > 0) or type(
                         annotations[a]) is not str:
-                    setattr(node, a, check_str_for_bool(annotations[a]))
-                    node.annotations.add_bound_attribute(a)
+                    nodeAnnotator.annotate(node, a, check_str_for_bool(annotations[a]))
 
     def annotate_mrca(self, trait_name, value):
         taxon_set = [tip.taxon for tip in
@@ -103,10 +102,9 @@ class TreeAnnotator:
         current_annotation = mrca.annotations.get_value("%s-mrca" % trait_name)
         if current_annotation is not None:
             print("common mrca concatenating %s and %s" % (current_annotation, value))
-            setattr(mrca, "%s-mrca" % trait_name, current_annotation + "-" + value)
+            nodeAnnotator.annotate(mrca, "%s-mrca" % trait_name, current_annotation + "-" + value)
         else:
-            setattr(mrca, "%s-mrca" % trait_name, value)
-            mrca.annotations.add_bound_attribute("%s-mrca" % trait_name)
+            nodeAnnotator.annotate(mrca, "%s-mrca" % trait_name, value)
         return mrca
 
     def fitch_parsimony(self, node, name):
@@ -137,14 +135,11 @@ class TreeAnnotator:
                 cutoff = node.num_child_nodes() / 2
                 majority = [state for state in unique_states if state_counts[unique_states.index(state)] > cutoff]
                 value = majority if len(majority) > 0 else value
-                setattr(node, "children_" + name, unique_states)
-                setattr(node, "children_" + name + "_counts", state_counts)
-                node.annotations.add_bound_attribute("children_" + name)
-                node.annotations.add_bound_attribute("children_" + name + "_counts")
 
-        setattr(node, name, value[0] if len(value) == 1 else value)
+                nodeAnnotator.annotate(node, "children_" + name, unique_states)
+                nodeAnnotator.annotate(node, "children_" + name + "_counts", state_counts)
 
-        node.annotations.add_bound_attribute(name)
+        nodeAnnotator.annotate(node, name, value[0] if len(value) == 1 else value)
 
         return value
 
@@ -182,7 +177,7 @@ class TreeAnnotator:
                         set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
                                                                                  state in child_states]
 
-        setattr(node, name, assigned_states[0] if len(assigned_states) == 1 else assigned_states)
+        nodeAnnotator.annotate(node, name, assigned_states[0] if len(assigned_states) == 1 else assigned_states)
 
         for child in node.child_node_iter():
             self.reconstruct_ancestors(child, assigned_states, acctran, name, maxtran_value)

@@ -13,7 +13,7 @@ class Options:
     def __init__(self):
         self.input = "%s/test.tree" % data_dir
         self.collapse = 5E-6
-        self.format = "nexus"
+        self.in_format = "nexus"
 
 
 class TestFitch(unittest.TestCase):
@@ -85,12 +85,13 @@ class TestFitch(unittest.TestCase):
         polytomy = dendropy.Tree.get_from_string(text, "newick")
         annotator = annotate_tree.TreeAnnotator(polytomy)
         annotator.fitch_parsimony(polytomy.seed_node, "t")
-        self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), ["1", "2"])
+        self.assertCountEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"),
+                              ["1", "2"])
 
     def test_polytomy_majority(self):
         text = "(A[&t=1]:1,(B[&t=1]:1,(C[&t=1]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
         polytomy = dendropy.Tree.get_from_string(text, "newick")
-        annotator = annotate_tree.TreeAnnotator(polytomy, True)
+        annotator = annotate_tree.TreeAnnotator(polytomy, majority_rule=True)
         annotator.fitch_parsimony(polytomy.seed_node, "t")
         self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "1")
 

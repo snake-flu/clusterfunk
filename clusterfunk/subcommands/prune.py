@@ -13,7 +13,7 @@ from clusterfunk.utils import prepare_tree, write_tree
 
 def prune_lineage(subtree, options):
     tree_to_prune = dendropy.Tree(seed_node=copy.deepcopy(subtree["mrca"]),
-                                  taxon_namespace=dendropy.TaxonNamespace())
+                                  taxon_namespace=copy.deepcopy(dendropy.TaxonNamespace()))
     pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), options.extract)
     pruner.set_taxon_set([taxon.label for taxon in subtree["taxa"]])
     pruner.prune(tree_to_prune)
@@ -45,6 +45,8 @@ def run(options):
 
         pruner.prune(tree)
 
+        for tip in tree.leaf_node_iter():
+            print("About to write tree %s with value: %s" % (tip.taxon.label, tip.annotations.get_value("uk_lineage")))
         write_tree(tree, options)
     else:
         if not os.path.exists(options.output):

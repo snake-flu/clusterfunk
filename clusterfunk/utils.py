@@ -42,3 +42,15 @@ class TreeHandler:
     def __init__(self, options):
         self.in_format = options.in_format
         self.tree = prepare_tree(options)
+
+
+class SafeNodeAnnotator:
+    def __init__(self, safe=True):
+        self.safe = safe
+
+    def annotate(self, node, name, value):
+        if self.safe:
+            if node.annotations.get_value(name) is not None:
+                node.annotations.drop(name=name)
+        setattr(node, name, value)
+        node.annotations.add_bound_attribute(name)

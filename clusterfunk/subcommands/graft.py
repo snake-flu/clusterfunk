@@ -1,6 +1,7 @@
 from clusterfunk.graft import RootStock
-from clusterfunk.utils import prepare_tree, write_tree
+from clusterfunk.utils import prepare_tree, write_tree, SafeNodeAnnotator
 
+nodeAnnotator = SafeNodeAnnotator(safe=True)
 
 def run(options):
     guide_tree = prepare_tree(options)
@@ -25,5 +26,4 @@ def run(options):
 
 def annotate_nodes(tree, trait_name, trait_value):
     for node in tree.postorder_node_iter():
-        setattr(node, trait_name, trait_value)
-        node.annotations.add_bound_attribute(trait_name)
+        nodeAnnotator.annotate(node, trait_name, trait_value)

@@ -1,11 +1,13 @@
 import dendropy
 import csv
 
+from clusterfunk.utils import SafeNodeAnnotator
 
+nodeAnnotator = SafeNodeAnnotator(safe=True)
 def phylotype_tree(tree, threshold=5e-6, suffix="p"):
     def phylotype_nodes(node, phylotype="p"):
-        node.phylotype = "\"" + phylotype + "\""
-        node.annotations.add_bound_attribute("phylotype")
+        nodeAnnotator.annotate(node, "phylotype", "\"" + phylotype + "\"")
+
         i = 1
         for child in node.child_node_iter():
             suffix = ""
