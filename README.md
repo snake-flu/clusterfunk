@@ -28,10 +28,10 @@ optional arguments:
 
 Available subcommands:
   
-    phylotype (phylotype_dat_tree)
+    phylotype 
                         Assigns phylotypes to a tree based on a branch length
                         threshold
-    annotate_tips (annotate_dat_tips)
+    annotate_tips 
                         Annotates the tips of tree. Can annotate tips from a
                         csv/tsv and/or taxon labels
     ancestral_reconstruction
@@ -42,19 +42,19 @@ Available subcommands:
                         the mrca of nodes with each value of the trait
                         provided and pushes the annotation up to any
                         descendent tip
-    extract_tip_annotations (extract_dat_tree)
+    extract_tip_annotations 
                         extracts annotations from tips in a tree and ouputs a
                         csv
-    get_taxa (get_dat_taxa)
+    get_taxa 
                         extracts taxa labels from tips in a tree
-    label_transitions (label_dat_transition)
+    label_transitions 
                         counts and labels transitions of traits on a tree
-    prune (prune_dat_tree)
+    prune 
                         Prunes a tree either removing the specified taxa or
                         keeping only those specified. Taxa can be specified
                         from a fasta file, text file, metadata file, or by an
                         annotation.
-    graft (graft_dat_tree)
+    graft 
                         This function grafts trees (scions) onto a guide tree
                         (input). The scion tree is grafted onto the guide tree
                         at the MRCA of the tips shared between the two. Any
