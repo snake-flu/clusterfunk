@@ -7,7 +7,7 @@ nodeAnnotator = SafeNodeAnnotator(safe=True)
 
 class TransitionAnnotator:
     def __init__(self, trait, include_parent, transition_name, transition_suffix="", include_root=False,
-                 maxtrans=False):
+                 stubborn=False):
 
         self.trait = trait
         self.From = None
@@ -18,7 +18,7 @@ class TransitionAnnotator:
         self.found_transition = False
         self.transition_suffix = transition_suffix
         self.include_root = include_root
-        self.maxtrans = maxtrans
+        self.stubborn = stubborn
 
         self.transition_name = transition_name
 
@@ -27,9 +27,8 @@ class TransitionAnnotator:
         if From is None and to is None:
             raise ValueError("Must provide at least a from or to state")
 
-        if From is not None and self.maxtrans:
-            raise ValueError("maxtrans not implemented for use with from")
-
+        if From is not None and self.stubborn:
+            raise ValueError("stubborn not implemented for use with from")
         self.From = From
         self.to = to
         self.count = 0
@@ -42,6 +41,7 @@ class TransitionAnnotator:
         node_state = node.annotations.get_value(self.trait)
         parent_state = node.parent_node.annotations.get_value(self.trait) if node.parent_node != None else None
 
+
         if parent_state is not None:
             if self.From is not None:
                 if parent_state == self.From:
@@ -49,7 +49,7 @@ class TransitionAnnotator:
                         if node_state == self.to:
                             self.transition_points.append(node)
                             self.count += 1
-                            setattr(node, self.transition_name, self.transition_suffix + str(self.count))
+                            nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
                     elif node_state != parent_state:
                         self.transition_points.append(node)
                         self.count += 1
@@ -60,34 +60,35 @@ class TransitionAnnotator:
                         if node.parent_node.annotations.get_value(self.transition_name) is not None:
                             nodeAnnotator.annotate(node, self.transition_name,
                                                    node.parent_node.annotations.get_value(self.transition_name))
-
-
             else:
-                if node_state == self.to:
-                    if parent_state == self.to:
-                        nodeAnnotator.annotate(node, self.transition_name,
+                if self.stubborn:
+                    if node.parent_node.annotations.get_value(self.transition_name) is not None:
+                        #In a transition
+                        if node.is_leaf():
+                            if node_state == self.to:
+                                nodeAnnotator.annotate(node, self.transition_name,
+                                                       node.parent_node.annotations.get_value(self.transition_name))
+                        else:
+                            nodeAnnotator.annotate(node, self.transition_name,
                                                node.parent_node.annotations.get_value(self.transition_name))
-
-                    elif self.maxtrans and node.parent_node.annotations.get_value(self.transition_name) is not None:
-                        nodeAnnotator.annotate(node, self.transition_name,
-                                               node.parent_node.annotations.get_value(self.transition_name))
-
-
                     else:
-                        self.transition_points.append(node)
-                        self.count += 1
-                        nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
-
-
-                elif self.maxtrans and node.num_child_nodes() > 2:
-                    children_at_to = 0
-                    for child in node.child_node_iter():
-                        if child.annotations.get_value(self.trait) == self.to:
-                            children_at_to += 1
-                    if children_at_to > 1:
-                        self.transition_points.append(node)
-                        self.count += 1
-                        nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
+                        if node_state == self.to:
+                            if parent_state == self.to:
+                                nodeAnnotator.annotate(node, self.transition_name,
+                                                       node.parent_node.annotations.get_value(self.transition_name))
+                            else:
+                                self.transition_points.append(node)
+                                self.count += 1
+                                nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
+                else:
+                    if node_state == self.to:
+                        if parent_state == self.to:
+                            nodeAnnotator.annotate(node, self.transition_name,
+                                                   node.parent_node.annotations.get_value(self.transition_name))
+                        else:
+                            self.transition_points.append(node)
+                            self.count += 1
+                            nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
 
 
         # this is the root
@@ -98,16 +99,6 @@ class TransitionAnnotator:
                         self.transition_points.append(node)
                         self.count += 1
                         nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
-
-                    elif self.maxtrans:
-                        children_at_to = 0
-                        for child in node.child_node_iter():
-                            if child.annotations.get_value(self.trait) == self.to:
-                                children_at_to += 1
-                        if children_at_to > 1:
-                            self.transition_points.append(node)
-                            self.count += 1
-                            nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
 
         for child in node.child_node_iter():
             self.traverse(child)

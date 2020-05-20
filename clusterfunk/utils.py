@@ -54,3 +54,15 @@ class SafeNodeAnnotator:
                 node.annotations.drop(name=name)
         setattr(node, name, value)
         node.annotations.add_bound_attribute(name)
+
+
+class NodeTraitMap:
+    def __init__(self):
+        self.traitDict = {}
+
+    def set(self, l):
+        node, trait = l
+        self.traitDict[hash(node)] = trait
+
+    def get(self, node):
+        return self.traitDict[hash(node)]
