@@ -45,8 +45,6 @@ def run(options):
 
         pruner.prune(tree)
 
-        for tip in tree.leaf_node_iter():
-            print("About to write tree %s with value: %s" % (tip.taxon.label, tip.annotations.get_value("uk_lineage")))
         write_tree(tree, options)
     else:
         if not os.path.exists(options.output):
