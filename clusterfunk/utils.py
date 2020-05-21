@@ -38,12 +38,6 @@ def prepare_tree(options, input_file_name=None):
     return tree
 
 
-class TreeHandler:
-    def __init__(self, options):
-        self.in_format = options.in_format
-        self.tree = prepare_tree(options)
-
-
 class SafeNodeAnnotator:
     def __init__(self, safe=True):
         self.safe = safe

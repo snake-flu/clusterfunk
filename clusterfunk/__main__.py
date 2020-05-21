@@ -52,11 +52,12 @@ def main(args=None):
              ' can not contain annotations')
 
     shared_arguments_parser.add_argument(
-        "-c",
-        "--collapse_to_polytomies",
-        dest='collapse',
-        type=float,
-        help='A optional flag to collapse branches with length <= the input before running the rule.')
+            "-c",
+            "--collapse_to_polytomies",
+            dest='collapse',
+            type=float,
+            default=None,
+            help='A optional flag to collapse branches with length <= the input before running the rule.')
     shared_arguments_parser.add_argument(
         "-v",
         "--verbose",
