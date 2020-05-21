@@ -449,8 +449,8 @@ def main(args=None):
         help="output annotation value prefix, default is \'\'"
     )
     subparser_merge_transitions.add_argument(
-            "--max-mergers",
-            dest="max_mergers",
+            "--max-merge",
+            dest="max_merge",
             default=1,
             type=int,
             help="The number of merges allowed on the path to the root from each merger"
