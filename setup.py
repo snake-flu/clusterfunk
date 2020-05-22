@@ -12,7 +12,8 @@ setup(
         install_requires=[
                 "biopython>=1.70",
                 "dendropy>=4.4.0",
-                "chardet>=3.0.4"
+                "chardet>=3.0.4",
+                "scipy>=1.4.1"
         ],
     classifiers=[
         "Development Status :: 4 - Beta",

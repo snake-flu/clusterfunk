@@ -580,25 +580,45 @@ def main(args=None):
     subparser_gaft.add_argument(
         "--annotate_scions",
         nargs="+",
-        help="A list of annotation values to add to the scion trees in the same order the trees are listed."
+            help="A list of annotation values to add to the scion trees in the same order the trees are listed."
     )
     subparser_gaft.add_argument(
-        "--scion_annotation_name",
-        type=str,
-        default='scion_id',
-        help="the annotation name to be used in annotation each scion. default: scion_id"
+            "--scion_annotation_name",
+            type=str,
+            default='scion_id',
+            help="the annotation name to be used in annotation each scion. default: scion_id"
     )
     subparser_gaft.set_defaults(func=clusterfunk.subcommands.graft.run)
 
+    # _____________________________ get height kde ______________________________#
+    subparser_get_height_kde = subparsers.add_parser(
+            "get_height_kde",
+            usage="clusterfunk get_height_kde --trees all_the_trees -i my.target.tree -o my.combined.tree",
+            help="This function reformats a tree file",
+            parents=[shared_arguments_parser]
+    )
+    subparser_get_height_kde.add_argument(
+            "--trees",
+            nargs="+",
+            help="file containing the trees used to get height kde"
+    )
+    subparser_get_height_kde.add_argument(
+            "--threshold",
+            type=float,
+            default=0.5,
+            help="file containing the trees used to get height kde"
+    )
+    subparser_get_height_kde.set_defaults(func=clusterfunk.subcommands.annotate_target_tree.run)
+
     # ------------------------------reformat-----------------------------#
     subparser_annotate_lineages = subparsers.add_parser(
-        "annotate_lineages",
-        usage="clusterfunk reformat -i my.guide.tree -o my.combined.tree --trait=lineage",
-        help="This function reformats a tree file",
-        parents=[shared_arguments_parser]
+            "annotate_lineages",
+            usage="clusterfunk reformat -i my.guide.tree -o my.combined.tree --trait=lineage",
+            help="This function reformats a tree file",
+            parents=[shared_arguments_parser]
     )
     subparser_annotate_lineages.add_argument(
-        "--trait",
+            "--trait",
         type=str,
         default='lineage',
         help="the annotation name to reconstruct"
