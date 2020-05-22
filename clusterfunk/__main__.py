@@ -48,8 +48,8 @@ def main(args=None):
         action='store',
         default="nexus",
         choices=['nexus', 'newick', 'nexml'],
-        help='what format is the tree file. This is passed to dendropy. default is \'nexus\'. Note newick trees '
-             ' can not contain annotations')
+            help='what format is the tree file. This is passed to dendropy. default is \'nexus\'. Note newick trees '
+                 ' can not contain annotations')
 
     shared_arguments_parser.add_argument(
             "-c",
@@ -58,15 +58,22 @@ def main(args=None):
             type=float,
             default=None,
             help='A optional flag to collapse branches with length <= the input before running the rule.')
+    shared_required.add_argument(
+            "--tree-list",
+            dest="tree_list",
+            action="store_true",
+            default=False,
+            help='Does the input file contain multiple trees')
+
     shared_arguments_parser.add_argument(
-        "-v",
-        "--verbose",
-        dest="verbose",
-        action='store_true',
-        default=False)
+            "-v",
+            "--verbose",
+            dest="verbose",
+            action='store_true',
+            default=False)
 
     subparsers = parser.add_subparsers(
-        title="Available subcommands", help="", metavar=""
+            title="Available subcommands", help="", metavar=""
     )
 
     # _____________________________ phylotype ______________________________#

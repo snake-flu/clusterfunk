@@ -64,5 +64,4 @@ class TreePruner:
         else:
             tree.prune_taxa_with_labels(taxa_labels)
 
-        tree.purge_taxon_namespace()
         return tree

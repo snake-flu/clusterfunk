@@ -101,6 +101,8 @@ class PruneProcess(SubProcess):
                                 schema=self.options.out_format)
         return subtree["value"]
 
+    def cleanup(self, tree):
+        tree.purge_taxon_namespace()
 
 def run(options):
     prune_sub_process = PruneProcess(options)
