@@ -1,8 +1,10 @@
-import unittest
-import dendropy
 import os
-from clusterfunk.subtyper import Subtyper
-from clusterfunk.utils import collapse_nodes
+import unittest
+
+import dendropy
+
+from clusterfunk.utilities.subtyper import Subtyper
+from clusterfunk.utilities.utils import collapse_nodes
 
 this_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 data_dir = os.path.join(this_dir, "tests", 'data', 'subtype')

@@ -1,14 +1,15 @@
 import csv
 import re
-from scipy import stats
+
 import chardet
 import dendropy
 from Bio import SeqIO
 from numpy import linspace
+from scipy import stats
 
 from clusterfunk.Main import Main
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import SafeNodeAnnotator
+from clusterfunk.utilities.utils import SafeNodeAnnotator
 
 nodeAnnotator = SafeNodeAnnotator()
 

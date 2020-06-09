@@ -1,7 +1,7 @@
 import re
 import warnings
 
-from clusterfunk.utils import check_str_for_bool, safeNodeAnnotator
+from clusterfunk.utilities.utils import check_str_for_bool, safeNodeAnnotator
 
 
 class TreeAnnotator:

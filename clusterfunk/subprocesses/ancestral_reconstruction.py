@@ -1,6 +1,6 @@
-from clusterfunk.annotate_tree import TreeAnnotator
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import check_str_for_bool
+from clusterfunk.utilities.treeAnnotator import TreeAnnotator
+from clusterfunk.utilities.utils import check_str_for_bool
 
 
 class AncestorReconstructor(SubProcess):

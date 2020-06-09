@@ -2,7 +2,7 @@ import unittest
 
 import dendropy
 
-from clusterfunk.trait_merger import Merger
+from clusterfunk.utilities.merger import Merger
 
 
 class MyTestCase(unittest.TestCase):

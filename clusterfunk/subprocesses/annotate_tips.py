@@ -1,10 +1,8 @@
-import csv
+import re
 
-import chardet
-
-from clusterfunk.annotate_tree import *
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import MetadataParser
+from clusterfunk.utilities.treeAnnotator import TreeAnnotator
+from clusterfunk.utilities.utils import MetadataParser
 
 
 class TipAnnotator(SubProcess):

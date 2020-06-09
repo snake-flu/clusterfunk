@@ -1,6 +1,6 @@
-from clusterfunk.graft import RootStock
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import prepare_tree, safeNodeAnnotator
+from clusterfunk.utilities.rootStock import RootStock
+from clusterfunk.utilities.utils import prepare_tree, safeNodeAnnotator
 
 
 class Grafter(SubProcess):

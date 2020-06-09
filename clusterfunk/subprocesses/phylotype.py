@@ -1,5 +1,5 @@
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import safeNodeAnnotator
+from clusterfunk.utilities.utils import safeNodeAnnotator
 
 """
 Phylotype a tree. Essentially codify the internal nodes on a tree. No tip can have a unique phylotype.

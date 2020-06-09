@@ -1,18 +1,22 @@
-from clusterfunk.utils import NodeTraitMap, SafeNodeAnnotator
+from clusterfunk.subProcess import SubProcess
+from clusterfunk.utilities.utils import NodeTraitMap, safeNodeAnnotator
 
-nodeAnnotator = SafeNodeAnnotator()
 
+class MergeTransitions(SubProcess):
+    """
+    Merge transitions at polytomies allowing one such merge on each path to the root.
+    """
 
-class Merger:
-    def __init__(self, trait_to_merge, trait_name, prefix="", max_merge=1):
-        self.trait_to_merge = trait_to_merge
-        self.trait_name = trait_name
-        self.max_merge = max_merge
+    def __init__(self, options):
+        super().__init__(options)
+        self.trait_to_merge = options.trait_to_merge
+        self.trait_name = options.trait_name
+        self.max_merge = options.max_merge
         self.merge_counts = None
         self.count = 1
-        self.prefix = prefix
+        self.prefix = options.prefix
 
-    def merge(self, tree):
+    def run(self, tree):
         self.count = 1
 
         self.merge_counts = NodeTraitMap()
@@ -46,7 +50,7 @@ class Merger:
             self.count += 1
 
     def name_merger(self, node):
-        nodeAnnotator.annotate(node, self.trait_name, self.prefix + str(self.count))
+        safeNodeAnnotator.annotate(node, self.trait_name, self.prefix + str(self.count))
         for child in node.child_node_iter():
             if child.annotations.get_value(self.trait_to_merge) is not None:
                 self.name_merger(child)

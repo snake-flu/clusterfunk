@@ -1,7 +1,7 @@
 import argparse
 
 import clusterfunk
-import clusterfunk.subcommands
+import clusterfunk.subprocesses
 from clusterfunk.Main import Main
 
 
@@ -99,7 +99,7 @@ def main(args=None):
             help='prefix for each phylotype. (default:p)'
     )
 
-    subparser_phylotype.set_defaults(subprocess=clusterfunk.subcommands.phylotype.Phylotype)
+    subparser_phylotype.set_defaults(subprocess=clusterfunk.subprocesses.phylotype.Phylotype)
     # _____________________________ tree annotator ______________________________#
     subparser_annotate = subparsers.add_parser(
             "annotate_tips",
@@ -176,7 +176,7 @@ def main(args=None):
             default="(.*)",
             help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
-    subparser_annotate.set_defaults(subprocess=clusterfunk.subcommands.annotate_tips.TipAnnotator)
+    subparser_annotate.set_defaults(subprocess=clusterfunk.subprocesses.annotate_tips.TipAnnotator)
     # _____________________________ rename tips ______________________________#
     subparser_relabel = subparsers.add_parser(
             "relabel_tips",
@@ -244,7 +244,7 @@ def main(args=None):
             default="(.*)",
             help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
-    subparser_relabel.set_defaults(subprocess=clusterfunk.subcommands.relabel_tips.TipLabeler)
+    subparser_relabel.set_defaults(subprocess=clusterfunk.subprocesses.relabel_tips.TipLabeler)
 
     # _____________________________ Ancestral reconstruction ______________________________#
 
@@ -300,7 +300,7 @@ def main(args=None):
                  "be assigned. Default:False - the union of traits are assigned"
     )
     subparser_ancestral_reconstruction.set_defaults(
-            subprocess=clusterfunk.subcommands.ancestral_reconstruction.AncestorReconstructor)
+            subprocess=clusterfunk.subprocesses.ancestral_reconstruction.AncestorReconstructor)
 
     # _____________________________ push annotations to tips ______________________________#
     subparser_push_annotations_to_tips = subparsers.add_parser(
@@ -328,7 +328,7 @@ def main(args=None):
             help='optional filter for when to stop pushing annotation forward in preorder traversal from mrca.')
 
     subparser_push_annotations_to_tips.set_defaults(
-            subprocess=clusterfunk.subcommands.push_annotations_to_tips.AnnotationPusher)
+            subprocess=clusterfunk.subprocesses.push_annotations_to_tips.AnnotationPusher)
 
     # _____________________________ extract_tip_annotations ______________________________#
     subparser_extract_tip_annotations = subparsers.add_parser(
@@ -349,7 +349,7 @@ def main(args=None):
             help='Space separated list of traits to extract from tips')
 
     subparser_extract_tip_annotations.set_defaults(
-            subprocess=clusterfunk.subcommands.extract_tip_annotations.AnnotationExtractor)
+            subprocess=clusterfunk.subprocesses.extract_tip_annotations.AnnotationExtractor)
     # _____________________________ get_taxa ______________________________#
 
     subparser_get_taxa = subparsers.add_parser(
@@ -360,7 +360,7 @@ def main(args=None):
 
     )
 
-    subparser_get_taxa.set_defaults(subprocess=clusterfunk.subcommands.get_taxa.TaxaGetter)
+    subparser_get_taxa.set_defaults(subprocess=clusterfunk.subprocesses.get_taxa.TaxaGetter)
 
     # _____________________________ label_transitions ______________________________#
 
@@ -432,7 +432,7 @@ def main(args=None):
             default=False,
             help='A boolean flag that when used with --to will label all descendent re-entries of a transition as the parent')
 
-    subparser_label_transitions.set_defaults(subprocess=clusterfunk.subcommands.label_transitions.TranistionLabeler)
+    subparser_label_transitions.set_defaults(subprocess=clusterfunk.subprocesses.label_transitions.TranistionLabeler)
 
     # _____________________________ merge transitions ______________________________#
     subparser_merge_transitions = subparsers.add_parser(
@@ -466,7 +466,7 @@ def main(args=None):
             type=int,
             help="The number of merges allowed on the path to the root from each merger"
     )
-    subparser_merge_transitions.set_defaults(subprocess=clusterfunk.subcommands.merge_transitions.MergeTransitions)
+    subparser_merge_transitions.set_defaults(subprocess=clusterfunk.subprocesses.merge_transitions.MergeTransitions)
 
     # _____________________________ prune ______________________________#
 
@@ -545,7 +545,7 @@ def main(args=None):
             help="Number of threads to parallelize over"
     )
 
-    subparser_prune.set_defaults(subprocess=clusterfunk.subcommands.prune.PruneProcess)
+    subparser_prune.set_defaults(subprocess=clusterfunk.subprocesses.prune.PruneProcess)
 
     # ------------------------------reformat-----------------------------#
     subparser_reformat = subparsers.add_parser(
@@ -554,7 +554,7 @@ def main(args=None):
             help="This function reformats a tree file",
             parents=[shared_arguments_parser]
     )
-    subparser_reformat.set_defaults(subprocess=clusterfunk.subcommands.reformat.Reformat)
+    subparser_reformat.set_defaults(subprocess=clusterfunk.subprocesses.reformat.Reformat)
 
     # _____________________________ graft ______________________________#
     subparser_gaft = subparsers.add_parser(
@@ -591,7 +591,7 @@ def main(args=None):
             default='scion_id',
             help="the annotation name to be used in annotation each scion. default: scion_id"
     )
-    subparser_gaft.set_defaults(subprocess=clusterfunk.subcommands.graft.Grafter)
+    subparser_gaft.set_defaults(subprocess=clusterfunk.subprocesses.graft.Grafter)
 
     # ------------------------------sort-----------------------------#
     subparser_sort = subparsers.add_parser(
@@ -600,7 +600,7 @@ def main(args=None):
             help="This function sorts a tree at each internal node by increasing number of subtended tips",
             parents=[shared_arguments_parser]
     )
-    subparser_sort.set_defaults(subprocess=clusterfunk.subcommands.sort.Sorter)
+    subparser_sort.set_defaults(subprocess=clusterfunk.subprocesses.sort.Sorter)
 
     # ------------------------------find catchments-----------------------------#
     subparser_find_catchments = subparsers.add_parser(
@@ -670,7 +670,7 @@ def main(args=None):
     )
 
     subparser_find_catchments.set_defaults(
-        subprocess=clusterfunk.PatristicNeighbourhoodFinder.PatristicNeighbourhoodFinder)
+            subprocess=clusterfunk.subprocesses.patristicNeighbourhoodFinder.PatristicNeighbourhoodFinder)
 
     # # _____________________________ get height kde ______________________________#
     # subparser_get_height_kde = subparsers.add_parser(
@@ -690,7 +690,7 @@ def main(args=None):
     #         default=0.5,
     #         help="file containing the trees used to get height kde"
     # )
-    # subparser_get_height_kde.set_defaults(func=clusterfunk.subcommands.annotate_target_tree.run)
+    # subparser_get_height_kde.set_defaults(func=clusterfunk.subprocesses.annotate_target_tree.run)
 
     # # ------------------------------reformat-----------------------------#
     # subparser_annotate_lineages = subparsers.add_parser(
@@ -705,7 +705,7 @@ def main(args=None):
     #         default='lineage',
     #         help="the annotation name to reconstruct"
     # )
-    # subparser_annotate_lineages.set_defaults(func=clusterfunk.subcommands.annotate_lineages.run)
+    # subparser_annotate_lineages.set_defaults(func=clusterfunk.subprocesses.annotate_lineages.run)
 
     args = parser.parse_args()
 

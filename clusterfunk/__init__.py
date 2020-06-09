@@ -5,7 +5,6 @@ try:
 except:
     __version__ = "local"
 
-__all__ = ["annotate_tree", "extract_tip_annotations", "label_transitions", "prune",
-           "graft", "PatristicNeighbourhoodFinder"]
+__all__ = ["Main", "subProcess"]
 
 from clusterfunk import *

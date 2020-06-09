@@ -1,5 +1,7 @@
-from clusterfunk.subProcess import SubProcess
 import bisect
+
+from clusterfunk.subProcess import SubProcess
+
 
 class Sorter(SubProcess):
     def __init__(self, options):

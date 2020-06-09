@@ -1,9 +1,10 @@
 import os
 import unittest
-from clusterfunk import annotate_tree
+
 import dendropy
 
-from clusterfunk.utils import prepare_tree
+from clusterfunk import annotate_tree
+from clusterfunk.utilities.utils import prepare_tree
 
 this_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 data_dir = os.path.join(this_dir, "tests", 'data', 'maxtrans')

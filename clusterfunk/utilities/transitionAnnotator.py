@@ -1,6 +1,6 @@
 import dendropy
 
-from clusterfunk.utils import SafeNodeAnnotator
+from clusterfunk.utilities.utils import SafeNodeAnnotator
 
 nodeAnnotator = SafeNodeAnnotator(safe=True)
 

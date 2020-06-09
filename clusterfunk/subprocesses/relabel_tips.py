@@ -3,7 +3,7 @@ import sys
 import warnings
 
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import MetadataParser
+from clusterfunk.utilities.utils import MetadataParser
 
 
 class TipLabeler(SubProcess):

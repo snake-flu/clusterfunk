@@ -1,8 +1,8 @@
 import os
 
-from clusterfunk.label_transitions import *
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import check_str_for_bool
+from clusterfunk.utilities.transitionAnnotator import TransitionAnnotator
+from clusterfunk.utilities.utils import check_str_for_bool
 
 
 class TranistionLabeler(SubProcess):

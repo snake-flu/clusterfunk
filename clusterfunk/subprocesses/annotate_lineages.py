@@ -1,7 +1,5 @@
-import dendropy
-
-from clusterfunk.utils import prepare_tree, write_tree
-from clusterfunk.subtyper import Subtyper
+from clusterfunk.utilities.subtyper import Subtyper
+from clusterfunk.utilities.utils import prepare_tree, write_tree
 
 
 def run(options):

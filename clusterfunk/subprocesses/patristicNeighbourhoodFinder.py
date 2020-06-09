@@ -4,9 +4,9 @@ from multiprocessing.pool import ThreadPool
 
 import dendropy
 
-from clusterfunk.TaxaFileParser import TaxaFileParser
-from clusterfunk.prune import TreePruner
 from clusterfunk.subProcess import SubProcess
+from clusterfunk.utilities.taxaFileParser import TaxaFileParser
+from clusterfunk.utilities.treePruner import TreePruner
 
 
 class PatristicNeighbourhoodFinder(SubProcess):

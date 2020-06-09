@@ -1,7 +1,7 @@
 import re
 
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import safeNodeAnnotator
+from clusterfunk.utilities.utils import safeNodeAnnotator
 
 
 class AnnotationPusher(SubProcess):
