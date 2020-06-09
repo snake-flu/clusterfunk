@@ -177,7 +177,7 @@ def main(args=None):
             default="(.*)",
             help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
-    subparser_annotate.set_defaults(func=clusterfunk.subcommands.annotate_tips.run)
+    subparser_annotate.set_defaults(subprocess=clusterfunk.subcommands.annotate_tips.TipAnnotator)
     # _____________________________ rename tips ______________________________#
     subparser_relabel = subparsers.add_parser(
             "relabel_tips",
