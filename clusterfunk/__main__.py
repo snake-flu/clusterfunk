@@ -245,7 +245,7 @@ def main(args=None):
             default="(.*)",
             help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
-    subparser_relabel.set_defaults(func=clusterfunk.subcommands.relabel_tips.run)
+    subparser_relabel.set_defaults(subprocess=clusterfunk.subcommands.relabel_tips.TipLabeler)
 
     # _____________________________ Ancestral reconstruction ______________________________#
 

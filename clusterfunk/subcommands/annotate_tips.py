@@ -4,6 +4,7 @@ import chardet
 
 from clusterfunk.annotate_tree import *
 from clusterfunk.subProcess import SubProcess
+from clusterfunk.utils import MetadataParser
 
 
 class TipAnnotator(SubProcess):
@@ -14,6 +15,7 @@ class TipAnnotator(SubProcess):
 
     def __init__(self, options):
         super().__init__(options)
+        self.parser = MetadataParser()
 
     def run(self, tree):
 
@@ -26,7 +28,8 @@ class TipAnnotator(SubProcess):
         Annotations will be coming from a traits file (tsv or csv)
         """
         if self.options.traits_file is not None:
-            annotations = self.parse_traits_file()
+            annotations = self.parser.parse_dsv(self.options.traits_file, self.options.index_column,
+                                                self.options.trait_columns, self.options.parse_data)
             annotator.annotate_tips(annotations)
 
         """
@@ -60,15 +63,3 @@ class TipAnnotator(SubProcess):
                 values.sort()
                 for value in values:
                     annotator.annotate_mrca(trait_name, value)
-
-    def parse_traits_file(self):
-        get_data_key = re.compile(self.options.parse_data)
-        rawdata = open(self.options.traits_file, "rb").read()
-        result = chardet.detect(rawdata)
-
-        with open(self.options.traits_file, encoding=result['encoding']) as metadata:
-            dialect = csv.Sniffer().sniff(metadata.readline())
-            metadata.seek(0)
-            reader = csv.DictReader(metadata, dialect=dialect)
-            annotations = get_annotations(reader, self.options.index_column, get_data_key, self.options.trait_columns)
-        return annotations

@@ -1,8 +1,7 @@
 import re
 import warnings
-from collections import Counter
 
-from clusterfunk.utils import check_str_for_bool, SafeNodeAnnotator
+from clusterfunk.utils import SafeNodeAnnotator, check_str_for_bool
 
 nodeAnnotator = SafeNodeAnnotator(safe=True)
 
@@ -183,22 +182,3 @@ class TreeAnnotator:
             self.reconstruct_ancestors(child, assigned_states, acctran, name, maxtran_value)
 
 
-def get_annotations(annotation_list, index_column, data_name_matcher, traits):
-    """
-    :param annotation_list: list of dictionaries that hold annotatations
-    :param index_column: the key in the dictionary used to identify the taxon
-    :param data_name_matcher: regex to parse the entries in the index column into groups to match taxon name g
-    :param traits: name of trait keys to annotate
-    :return: a dictionary keyed by parsed index column entries. Entries are dictionaries with trait and value pairs
-    """
-    annotation_dict = {}
-    for row in annotation_list:
-        annotations = {}
-        taxon_name_match = data_name_matcher.match(row[index_column])
-        if not taxon_name_match:
-            raise ValueError("taxon name %s in input file does not match regex pattern" % row[index_column])
-        key_name = "".join(taxon_name_match.groups())
-        for trait in traits:
-            annotations[trait] = row[trait]
-        annotation_dict[key_name] = annotations
-    return annotation_dict
