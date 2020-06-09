@@ -8,6 +8,14 @@ text = "(((A[&test=1]:0.5,B:0.5):0.02,D:2):0.01,C:0.2);"
 tree = dendropy.Tree.get_from_string(text, "newick")
 
 
+class Options:
+    def __init__(self):
+        pass
+
+    def set(self, key, value):
+        setattr(self, key, value)
+
+
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         collapse_nodes(tree, 5E-2)

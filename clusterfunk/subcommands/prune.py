@@ -1,16 +1,14 @@
+import copy
 import os
 import re
 from collections import Counter
-import copy
 from multiprocessing.pool import ThreadPool
-from functools import partial
 
 import dendropy
 
 from clusterfunk.Main import Main
 from clusterfunk.prune import TreePruner
 from clusterfunk.subProcess import SubProcess
-from clusterfunk.utils import prepare_tree, write_tree
 
 
 def prune_lineage(subtree, options):
@@ -75,7 +73,7 @@ class PruneProcess(SubProcess):
         mrcas = []
         for value in no_singletons:
             taxa = [n.taxon for n in
-                    self.tree.leaf_node_iter(lambda n: n.annotations.get_value(options.trait) == value)]
+                    self.tree.leaf_node_iter(lambda n: n.annotations.get_value(self.options.trait) == value)]
             mrca = self.tree.mrca(taxa=taxa)
             mrcas.append(mrca)
             subtrees.append({"taxa": taxa, "mrca": mrca, "value": value})

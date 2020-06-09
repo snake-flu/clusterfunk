@@ -50,6 +50,9 @@ class SafeNodeAnnotator:
         node.annotations.add_bound_attribute(name)
 
 
+safeNodeAnnotator = SafeNodeAnnotator(True);
+
+
 class NodeTraitMap:
     def __init__(self):
         self.traitDict = {}

@@ -25,6 +25,8 @@ class Main:
         self.trees = None
         self.options = options
 
+        self.run()
+
     def run(self):
         """
         Read in the tree(s)
