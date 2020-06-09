@@ -1,23 +1,32 @@
 from clusterfunk.annotate_tree import TreeAnnotator
-from clusterfunk.utils import check_str_for_bool, prepare_tree
+from clusterfunk.subProcess import SubProcess
+from clusterfunk.utils import check_str_for_bool
 
 
-def run(options):
-    tree = prepare_tree(options, options.input)
+class AncestorReconstructor(SubProcess):
+    """
+    Ancestor reconstructor process. Makes calls to TreeAnnotator annotate nodes from tips
+    In the future the these methods might be added to this class
+    """
 
-    annotator = TreeAnnotator(tree)
+    def __init__(self, options):
+        super().__init__(options)
+        self.acctran = True if options.acctran else False
 
-    acctran = True if (options.acctran or options.maxtran is not None) else False
+    def run(self, tree):
+        """
+        Annotate from tips for each trait provided at construction
+        :param tree:
+        :return:
+        """
+        annotator = TreeAnnotator(tree)
 
-    if len(options.traits) > 0:
-        i = 0
-        for trait in options.traits:
-            ancestral_state = check_str_for_bool(options.ancestral_state[i]) if len(
-                    options.ancestral_state) > i else None
-            maxtran = check_str_for_bool(options.maxtran[i]) if options.maxtran is not None and len(
-                options.maxtran) > i else None
+        if len(self.options.traits) > 0:
+            i = 0
+            for trait in self.options.traits:
+                # Get ancestral state if provided at command line
+                ancestral_state = (check_str_for_bool(self.options.ancestral_state[i]) if len(
+                        self.options.ancestral_state) > i else None) if self.options.ancestral_state is not None else None
 
-            annotator.annotate_nodes_from_tips(trait, acctran, ancestral_state, maxtran)
-            i += 1
-
-    tree.write(path=options.output, schema=options.out_format)
+                annotator.annotate_nodes_from_tips(trait, self.acctran, ancestral_state)
+                i += 1

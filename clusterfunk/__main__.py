@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 import clusterfunk
 import clusterfunk.subcommands
@@ -251,7 +250,7 @@ def main(args=None):
 
     subparser_ancestral_reconstruction = subparsers.add_parser(
             "ancestral_reconstruction",
-            usage="clusterfunk ancestral_reconstruction --acctran/--deltran/--maxtran [--ancestral_state] [--majority_rule] "
+            usage="clusterfunk ancestral_reconstruction --acctran/--deltran [--ancestral_state] [--majority_rule] "
                   "--traits country -i my.tree -o my.annotated.tree ",
             help="Reconstructs ancestral states on internal nodes using Fitch parsimony algorithm",
             parents=[shared_arguments_parser]
@@ -273,13 +272,13 @@ def main(args=None):
             action='store_true',
             help="Boolean flag to use deltran reconstruction")
 
-    reconstruction_options.add_argument(
-            '--maxtran-with-value',
-            dest='maxtran',
-            metavar="<values>",
-            nargs="+",
-            help="use acctran except at polytomy if multiple children have <value> then the polytomy "
-                 "node is included. values are in the same order as traits")
+    # reconstruction_options.add_argument(
+    #         '--maxtran-with-value',
+    #         dest='maxtran',
+    #         metavar="<values>",
+    #         nargs="+",
+    #         help="use acctran except at polytomy if multiple children have <value> then the polytomy "
+    #              "node is included. values are in the same order as traits")
 
     subparser_ancestral_reconstruction.add_argument(
             "--traits",
@@ -300,7 +299,8 @@ def main(args=None):
                  "should the trait that appears most in the children"
                  "be assigned. Default:False - the union of traits are assigned"
     )
-    subparser_ancestral_reconstruction.set_defaults(func=clusterfunk.subcommands.ancestral_reconstruction.run)
+    subparser_ancestral_reconstruction.set_defaults(
+        subprocess=clusterfunk.subcommands.ancestral_reconstruction.AncestorReconstructor)
 
     # _____________________________ push annotations to tips ______________________________#
     subparser_push_annotations_to_tips = subparsers.add_parser(
