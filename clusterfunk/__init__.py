@@ -6,6 +6,6 @@ except:
     __version__ = "local"
 
 __all__ = ["annotate_tree", "extract_tip_annotations", "label_transitions", "prune",
-           "graft"]
+           "graft", "PatristicNeighbourhoodFinder"]
 
 from clusterfunk import *

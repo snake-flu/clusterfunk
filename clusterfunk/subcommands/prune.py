@@ -10,21 +10,6 @@ from clusterfunk.prune import TreePruner
 from clusterfunk.subProcess import SubProcess
 
 
-def prune_lineage(subtree, options):
-    tree_to_prune = dendropy.Tree(seed_node=copy.deepcopy(subtree["mrca"]),
-                                  taxon_namespace=copy.deepcopy(dendropy.TaxonNamespace()))
-    pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), options.extract)
-    pruner.set_taxon_set([taxon.label for taxon in subtree["taxa"]])
-    pruner.prune(tree_to_prune)
-    if options.out_format == "newick":
-        tree_to_prune.write(path=options.output + "/" + options.trait + "_" + subtree["value"] + ".tree",
-                            schema=options.out_format, suppress_rooting=True)
-    else:
-        tree_to_prune.write(path=options.output + "/" + options.trait + "_" + subtree["value"] + ".tree",
-                            schema=options.out_format)
-    return subtree["value"]
-
-
 class PruneProcess(SubProcess):
     """
     The logic for pruning trees

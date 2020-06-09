@@ -300,7 +300,7 @@ def main(args=None):
                  "be assigned. Default:False - the union of traits are assigned"
     )
     subparser_ancestral_reconstruction.set_defaults(
-        subprocess=clusterfunk.subcommands.ancestral_reconstruction.AncestorReconstructor)
+            subprocess=clusterfunk.subcommands.ancestral_reconstruction.AncestorReconstructor)
 
     # _____________________________ push annotations to tips ______________________________#
     subparser_push_annotations_to_tips = subparsers.add_parser(
@@ -328,7 +328,7 @@ def main(args=None):
             help='optional filter for when to stop pushing annotation forward in preorder traversal from mrca.')
 
     subparser_push_annotations_to_tips.set_defaults(
-        subprocess=clusterfunk.subcommands.push_annotations_to_tips.AnnotationPusher)
+            subprocess=clusterfunk.subcommands.push_annotations_to_tips.AnnotationPusher)
 
     # _____________________________ extract_tip_annotations ______________________________#
     subparser_extract_tip_annotations = subparsers.add_parser(
@@ -349,7 +349,7 @@ def main(args=None):
             help='Space separated list of traits to extract from tips')
 
     subparser_extract_tip_annotations.set_defaults(
-        subprocess=clusterfunk.subcommands.extract_tip_annotations.AnnotationExtractor)
+            subprocess=clusterfunk.subcommands.extract_tip_annotations.AnnotationExtractor)
     # _____________________________ get_taxa ______________________________#
 
     subparser_get_taxa = subparsers.add_parser(
@@ -556,7 +556,6 @@ def main(args=None):
     )
     subparser_reformat.set_defaults(subprocess=clusterfunk.subcommands.reformat.Reformat)
 
-
     # _____________________________ graft ______________________________#
     subparser_gaft = subparsers.add_parser(
             "graft",
@@ -602,6 +601,76 @@ def main(args=None):
             parents=[shared_arguments_parser]
     )
     subparser_sort.set_defaults(subprocess=clusterfunk.subcommands.sort.Sorter)
+
+    # ------------------------------find catchments-----------------------------#
+    subparser_find_catchments = subparsers.add_parser(
+            "find_catchments",
+            usage="clusterfunk find_catchments -i my.tree -o directory/with/ouput/trees ",
+            help="This function takes in a tree and a taxon list. It searches the neighborhood of these taxa and "
+                 "return subtrees containing all tips within a set threshold. Overlapping catchments are merged.",
+            parents=[shared_arguments_parser]
+    )
+
+    subparser_find_catchments.add_argument(
+            "--threshold",
+            type=float,
+            help="The patristic distance threshold that defines a catchment"
+    )
+    subparser_find_catchments.add_argument(
+            "--include-terminal-branch",
+            dest="include_terminal_branch",
+            action="store_true",
+            default=False,
+            help="Boolean flag stating the terminal branchlengths should be included in the distances. Defualt is "
+                 "False, only distances along internal branches count. "
+    )
+    taxon_set_files = subparser_find_catchments.add_mutually_exclusive_group(required=True)
+
+    taxon_set_files.add_argument(
+            "--fasta",
+            help="incoming fasta file defining taxon set"
+    )
+    taxon_set_files.add_argument(
+            "--taxon",
+            help="incoming text file defining taxon set with a new taxon on each line"
+    )
+    taxon_set_files.add_argument(
+            "--metadata",
+            help="incoming csv/tsv file defining taxon set."
+    )
+
+    meta_data_options = subparser_find_catchments.add_argument_group("metadata options")
+
+    meta_data_options.add_argument(
+            "--index-column",
+            dest="index_column",
+            help="column of metadata that holds the taxon names"
+    )
+    subparser_find_catchments.add_argument(
+            "--parse-data-key",
+            dest="data_taxon_pattern",
+            metavar="<regex>",
+            default="(.*)",
+            help="regex defined group(s) to construct keys from the data file to match the taxon labels"
+    )
+    subparser_find_catchments.add_argument(
+            "--parse-taxon-key",
+            dest="parse_taxon",
+            metavar="<regex>",
+            default="(.*)",
+            help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
+    )
+
+    subparser_find_catchments.add_argument(
+            "-t", "--threads",
+            dest="threads",
+            type=int,
+            default=1,
+            help="Number of threads to parallelize over"
+    )
+
+    subparser_find_catchments.set_defaults(
+        subprocess=clusterfunk.PatristicNeighbourhoodFinder.PatristicNeighbourhoodFinder)
 
     # # _____________________________ get height kde ______________________________#
     # subparser_get_height_kde = subparsers.add_parser(

@@ -6,7 +6,7 @@ from Bio import SeqIO
 
 
 class TreePruner:
-    def __init__(self, data_taxon_regex, tree_taxon_regex, extract):
+    def __init__(self, data_taxon_regex=re.compile("(.*)"), tree_taxon_regex=re.compile("(.*)"), extract=False):
         self.data_taxon_regex = data_taxon_regex
         self.tree_taxon_regex = tree_taxon_regex
         self.taxon_set = []
