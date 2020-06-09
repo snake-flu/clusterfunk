@@ -556,6 +556,7 @@ def main(args=None):
     )
     subparser_reformat.set_defaults(subprocess=clusterfunk.subcommands.reformat.Reformat)
 
+
     # _____________________________ graft ______________________________#
     subparser_gaft = subparsers.add_parser(
             "graft",
@@ -592,6 +593,15 @@ def main(args=None):
             help="the annotation name to be used in annotation each scion. default: scion_id"
     )
     subparser_gaft.set_defaults(subprocess=clusterfunk.subcommands.graft.Grafter)
+
+    # ------------------------------sort-----------------------------#
+    subparser_sort = subparsers.add_parser(
+            "sort",
+            usage="clusterfunk sort -i my.tree -o my.sorted.tree --in-format nexus --out-format newick",
+            help="This function sorts a tree at each internal node by increasing number of subtended tips",
+            parents=[shared_arguments_parser]
+    )
+    subparser_sort.set_defaults(subprocess=clusterfunk.subcommands.sort.Sorter)
 
     # # _____________________________ get height kde ______________________________#
     # subparser_get_height_kde = subparsers.add_parser(
