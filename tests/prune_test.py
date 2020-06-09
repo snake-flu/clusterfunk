@@ -1,6 +1,6 @@
+import os
 import re
 import unittest
-import os
 
 import dendropy
 
@@ -44,12 +44,15 @@ class Prune_tests(unittest.TestCase):
         pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), False)
         pruner.set_taxon_set(["A", "A2"])
         pruner.prune(self.tree)
+        self.tree.purge_taxon_namespace()
+
         self.assertEqual([taxon.label for taxon in self.tree.taxon_set], ["B", "C"])
 
     def test_extract(self):
         pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), True)
         pruner.set_taxon_set(["A", "A2"])
         pruner.prune(self.tree)
+        self.tree.purge_taxon_namespace()
         print(self.tree.as_ascii_plot())
         self.assertEqual([taxon.label for taxon in self.tree.taxon_set], ["A", "A2"])
 

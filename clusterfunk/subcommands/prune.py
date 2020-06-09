@@ -6,7 +6,6 @@ from multiprocessing.pool import ThreadPool
 
 import dendropy
 
-from clusterfunk.Main import Main
 from clusterfunk.prune import TreePruner
 from clusterfunk.subProcess import SubProcess
 
@@ -27,6 +26,10 @@ def prune_lineage(subtree, options):
 
 
 class PruneProcess(SubProcess):
+    """
+    The logic for pruning trees
+    """
+
     def __init__(self, options):
         super().__init__(options)
         self.tree = None
@@ -101,8 +104,3 @@ class PruneProcess(SubProcess):
 
     def cleanup(self, tree):
         tree.purge_taxon_namespace()
-
-def run(options):
-    prune_sub_process = PruneProcess(options)
-    main = Main(options, prune_sub_process)
-    main.run()

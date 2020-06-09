@@ -306,7 +306,7 @@ def main(args=None):
     subparser_push_annotations_to_tips = subparsers.add_parser(
             "push_annotations_to_tips",
             usage="clusterfunk annotate_tips_from_nodes  --traits country -i my.tree -o my.annotated.tree ",
-            help="This funk pushes annotations to tips. It identifies the  mrca of nodes with each value of the trait"
+            help="This function pushes annotations to tips. It identifies the  mrca of nodes with each value of the trait"
                  " provided and pushes the annotation up to any descendent tip",
             parents=[shared_arguments_parser]
     )
@@ -327,7 +327,8 @@ def main(args=None):
             type=str,
             help='optional filter for when to stop pushing annotation forward in preorder traversal from mrca.')
 
-    subparser_push_annotations_to_tips.set_defaults(func=clusterfunk.subcommands.push_annotations_to_tips.run)
+    subparser_push_annotations_to_tips.set_defaults(
+        subprocess=clusterfunk.subcommands.push_annotations_to_tips.AnnotationPusher)
 
     # _____________________________ extract_tip_annotations ______________________________#
     subparser_extract_tip_annotations = subparsers.add_parser(
@@ -347,7 +348,8 @@ def main(args=None):
             nargs="+",
             help='Space separated list of traits to extract from tips')
 
-    subparser_extract_tip_annotations.set_defaults(func=clusterfunk.subcommands.extract_tip_annotations.run)
+    subparser_extract_tip_annotations.set_defaults(
+        subprocess=clusterfunk.subcommands.extract_tip_annotations.AnnotationExtractor)
     # _____________________________ get_taxa ______________________________#
 
     subparser_get_taxa = subparsers.add_parser(
@@ -358,7 +360,7 @@ def main(args=None):
 
     )
 
-    subparser_get_taxa.set_defaults(func=clusterfunk.subcommands.get_taxa.run)
+    subparser_get_taxa.set_defaults(subprocess=clusterfunk.subcommands.get_taxa.TaxaGetter)
 
     # _____________________________ label_transitions ______________________________#
 
@@ -430,7 +432,7 @@ def main(args=None):
             default=False,
             help='A boolean flag that when used with --to will label all descendent re-entries of a transition as the parent')
 
-    subparser_label_transitions.set_defaults(func=clusterfunk.subcommands.label_transitions.run)
+    subparser_label_transitions.set_defaults(subprocess=clusterfunk.subcommands.label_transitions.TranistionLabeler)
 
     # _____________________________ merge transitions ______________________________#
     subparser_merge_transitions = subparsers.add_parser(
@@ -464,7 +466,7 @@ def main(args=None):
             type=int,
             help="The number of merges allowed on the path to the root from each merger"
     )
-    subparser_merge_transitions.set_defaults(func=clusterfunk.subcommands.merge_transitions.run)
+    subparser_merge_transitions.set_defaults(subprocess=clusterfunk.subcommands.merge_transitions.MergeTransitions)
 
     # _____________________________ prune ______________________________#
 
@@ -543,7 +545,7 @@ def main(args=None):
             help="Number of threads to parallelize over"
     )
 
-    subparser_prune.set_defaults(func=clusterfunk.subcommands.prune.run)
+    subparser_prune.set_defaults(subprocess=clusterfunk.subcommands.prune.PruneProcess)
 
     # ------------------------------reformat-----------------------------#
     subparser_reformat = subparsers.add_parser(
@@ -552,7 +554,7 @@ def main(args=None):
             help="This function reformats a tree file",
             parents=[shared_arguments_parser]
     )
-    subparser_reformat.set_defaults(func=clusterfunk.subcommands.reformat.run)
+    subparser_reformat.set_defaults(subprocess=clusterfunk.subcommands.reformat.Reformat)
 
     # _____________________________ graft ______________________________#
     subparser_gaft = subparsers.add_parser(
@@ -579,52 +581,52 @@ def main(args=None):
                  "scion tree. i.e. all tips in the output tree come from the scions"
     )
     subparser_gaft.add_argument(
-            "--annotate_scions",
+            "--annotate-scions",
             nargs="+",
             help="A list of annotation values to add to the scion trees in the same order the trees are listed."
     )
     subparser_gaft.add_argument(
-            "--scion_annotation_name",
+            "--scion-annotation-name",
             type=str,
             default='scion_id',
             help="the annotation name to be used in annotation each scion. default: scion_id"
     )
-    subparser_gaft.set_defaults(func=clusterfunk.subcommands.graft.run)
+    subparser_gaft.set_defaults(subprocess=clusterfunk.subcommands.graft.Grafter)
 
-    # _____________________________ get height kde ______________________________#
-    subparser_get_height_kde = subparsers.add_parser(
-            "get_height_kde",
-            usage="clusterfunk get_height_kde --trees all_the_trees -i my.target.tree -o my.combined.tree",
-            help="This function reformats a tree file",
-            parents=[shared_arguments_parser]
-    )
-    subparser_get_height_kde.add_argument(
-            "--trees",
-            nargs="+",
-            help="file containing the trees used to get height kde"
-    )
-    subparser_get_height_kde.add_argument(
-            "--threshold",
-            type=float,
-            default=0.5,
-            help="file containing the trees used to get height kde"
-    )
-    subparser_get_height_kde.set_defaults(func=clusterfunk.subcommands.annotate_target_tree.run)
+    # # _____________________________ get height kde ______________________________#
+    # subparser_get_height_kde = subparsers.add_parser(
+    #         "get_height_kde",
+    #         usage="clusterfunk get_height_kde --trees all_the_trees -i my.target.tree -o my.combined.tree",
+    #         help="This function reformats a tree file",
+    #         parents=[shared_arguments_parser]
+    # )
+    # subparser_get_height_kde.add_argument(
+    #         "--trees",
+    #         nargs="+",
+    #         help="file containing the trees used to get height kde"
+    # )
+    # subparser_get_height_kde.add_argument(
+    #         "--threshold",
+    #         type=float,
+    #         default=0.5,
+    #         help="file containing the trees used to get height kde"
+    # )
+    # subparser_get_height_kde.set_defaults(func=clusterfunk.subcommands.annotate_target_tree.run)
 
-    # ------------------------------reformat-----------------------------#
-    subparser_annotate_lineages = subparsers.add_parser(
-            "annotate_lineages",
-            usage="clusterfunk reformat -i my.guide.tree -o my.combined.tree --trait=lineage",
-            help="This function reformats a tree file",
-            parents=[shared_arguments_parser]
-    )
-    subparser_annotate_lineages.add_argument(
-            "--trait",
-            type=str,
-            default='lineage',
-            help="the annotation name to reconstruct"
-    )
-    subparser_annotate_lineages.set_defaults(func=clusterfunk.subcommands.annotate_lineages.run)
+    # # ------------------------------reformat-----------------------------#
+    # subparser_annotate_lineages = subparsers.add_parser(
+    #         "annotate_lineages",
+    #         usage="clusterfunk reformat -i my.guide.tree -o my.combined.tree --trait=lineage",
+    #         help="This function reformats a tree file",
+    #         parents=[shared_arguments_parser]
+    # )
+    # subparser_annotate_lineages.add_argument(
+    #         "--trait",
+    #         type=str,
+    #         default='lineage',
+    #         help="the annotation name to reconstruct"
+    # )
+    # subparser_annotate_lineages.set_defaults(func=clusterfunk.subcommands.annotate_lineages.run)
 
     args = parser.parse_args()
 

@@ -1,31 +1,7 @@
 import re
 import warnings
 
-from clusterfunk.utils import SafeNodeAnnotator, check_str_for_bool
-
-nodeAnnotator = SafeNodeAnnotator(safe=True)
-
-
-def push_trait_to_tips(node, trait_name, value, predicate=lambda x: True):
-    def action(n):
-        if n.is_leaf():
-            nodeAnnotator.annotate(n, trait_name, value)
-
-    traverse_and_annotate = TraversalAction(predicate, action)
-    if predicate(node):
-        traverse_and_annotate.run(node)
-
-
-class TraversalAction:
-    def __init__(self, predicate, action):
-        self.predicate = predicate
-        self.action = action
-
-    def run(self, node):
-        for child in node.child_node_iter():
-            if self.predicate(child):
-                self.action(child)
-                self.run(child)
+from clusterfunk.utils import check_str_for_bool, safeNodeAnnotator
 
 
 class TreeAnnotator:
@@ -68,9 +44,9 @@ class TreeAnnotator:
 
         if node.annotations.get_value(trait) is not None:
             if regex.match(str(node.annotations.get_value(trait))):
-                nodeAnnotator.annotate(node, boolean_trait_name, True)
+                safeNodeAnnotator.annotate(node, boolean_trait_name, True)
             else:
-                nodeAnnotator.annotate(node, boolean_trait_name, False)
+                safeNodeAnnotator.annotate(node, boolean_trait_name, False)
 
     def annotate_nodes_from_tips(self, name, acctran, parent_state=None, maxtran_value=None):
 
@@ -91,7 +67,7 @@ class TreeAnnotator:
             for a in annotations:
                 if annotations[a] and (type(annotations[a]) is str and len(annotations[a]) > 0) or type(
                         annotations[a]) is not str:
-                    nodeAnnotator.annotate(node, a, check_str_for_bool(annotations[a]))
+                    safeNodeAnnotator.annotate(node, a, check_str_for_bool(annotations[a]))
 
     def annotate_mrca(self, trait_name, value):
         taxon_set = [tip.taxon for tip in
@@ -101,9 +77,9 @@ class TreeAnnotator:
         current_annotation = mrca.annotations.get_value("%s-mrca" % trait_name)
         if current_annotation is not None:
             print("common mrca concatenating %s and %s" % (current_annotation, value))
-            nodeAnnotator.annotate(mrca, "%s-mrca" % trait_name, current_annotation + "-" + value)
+            safeNodeAnnotator.annotate(mrca, "%s-mrca" % trait_name, current_annotation + "-" + value)
         else:
-            nodeAnnotator.annotate(mrca, "%s-mrca" % trait_name, value)
+            safeNodeAnnotator.annotate(mrca, "%s-mrca" % trait_name, value)
         return mrca
 
     def fitch_parsimony(self, node, name):
@@ -135,10 +111,10 @@ class TreeAnnotator:
                 majority = [state for state in unique_states if state_counts[unique_states.index(state)] > cutoff]
                 value = majority if len(majority) > 0 else value
 
-                nodeAnnotator.annotate(node, "children_" + name, unique_states)
-                nodeAnnotator.annotate(node, "children_" + name + "_counts", state_counts)
+                safeNodeAnnotator.annotate(node, "children_" + name, unique_states)
+                safeNodeAnnotator.annotate(node, "children_" + name + "_counts", state_counts)
 
-        nodeAnnotator.annotate(node, name, value[0] if len(value) == 1 else value)
+        safeNodeAnnotator.annotate(node, name, value[0] if len(value) == 1 else value)
 
         return value
 
@@ -176,9 +152,7 @@ class TreeAnnotator:
                         set(parent_states).intersection(child_states)) > 0 else [state for state in assigned_states if
                                                                                  state in child_states]
 
-        nodeAnnotator.annotate(node, name, assigned_states[0] if len(assigned_states) == 1 else assigned_states)
+        safeNodeAnnotator.annotate(node, name, assigned_states[0] if len(assigned_states) == 1 else assigned_states)
 
         for child in node.child_node_iter():
             self.reconstruct_ancestors(child, assigned_states, acctran, name, maxtran_value)
-
-

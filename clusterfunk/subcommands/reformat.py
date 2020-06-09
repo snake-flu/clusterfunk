@@ -1,6 +1,6 @@
-from clusterfunk.utils import prepare_tree, write_tree
+from clusterfunk.subProcess import SubProcess
 
 
-def run(options):
-    tree = prepare_tree(options)
-    write_tree(tree, options)
+class Reformat(SubProcess):
+    def __init__(self, options):
+        super().__init__(options)

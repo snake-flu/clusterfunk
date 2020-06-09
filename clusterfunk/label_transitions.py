@@ -91,7 +91,6 @@ class TransitionAnnotator:
                             nodeAnnotator.annotate(node, self.transition_name, self.transition_suffix + str(self.count))
 
 
-        # this is the root
         else:
             if self.to is not None:
                 if self.include_root:
