@@ -42,6 +42,8 @@ class PruneProcess(SubProcess):
 
         if self.options.trait is None:
             self.prune_once()
+        else:
+            self.prune_for_each_trait()
 
     def prune_once(self):
         self.pruner.prune(self.tree)
