@@ -10,7 +10,7 @@ class MergeTransitions(SubProcess):
     def __init__(self, options):
         super().__init__(options)
         self.trait_to_merge = options.trait_to_merge
-        self.trait_name = options.trait_name
+        self.trait_name = options.merged_trait_name
         self.max_merge = options.max_merge
         self.merge_counts = None
         self.count = 1
