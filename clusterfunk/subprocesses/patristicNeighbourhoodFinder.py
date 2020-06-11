@@ -44,13 +44,16 @@ class PatristicNeighbourhoodFinder(SubProcess):
 
             currentNode = tree.find_node_with_taxon_label(taxon_label)
             if currentNode is not None:
-                neighborhood = set()
+                neighborhood = set([currentNode])
                 parent = currentNode.parent_node
                 self.search_the_neighborhood(parent, currentNode, neighborhood)
                 self.neighbours[taxon_label] = neighborhood
             else:
                 print("%s not found in tree" % taxon_label)
             sys.stdout.flush()
+            print("%s neighborhood size: %d" % (taxon_label, len(neighborhood)))
+            print("with %d tips" % (len([x for x in neighborhood if x.is_leaf()])))
+
             i += 1
 
         sys.stdout.write("\n")
@@ -62,6 +65,9 @@ class PatristicNeighbourhoodFinder(SubProcess):
             self.taxon_sets.append(self.current_taxon_set)
 
         print("found %d trees" % len(self.taxon_sets))
+        print("tips: %d and %d" % (len([x for x in self.taxon_sets[0] if x.is_leaf()]),
+                                   len([x for x in self.taxon_sets[1] if x.is_leaf()])))
+
         if not os.path.exists(self.options.output):
             os.makedirs(self.options.output)
         results = []
@@ -71,17 +77,19 @@ class PatristicNeighbourhoodFinder(SubProcess):
     def rally_the_neighbors(self, taxon1):
         for taxon2 in self.eligible_taxa:
             if len(self.neighbours[taxon1].intersection(self.neighbours[taxon2])) > 0:
-                self.current_taxon_set.union(self.neighbours[taxon2])
+                self.current_taxon_set = self.current_taxon_set.union(self.neighbours[taxon2])
                 self.eligible_taxa.remove(taxon2)
                 self.rally_the_neighbors(taxon2)
 
-    def prune_lineage(self, taxon_set):
-        taxon_list = list(taxon_set)
-        mrca = self.tree.mrca(taxon_labels=taxon_list)
+    def prune_lineage(self, nodes):
+        mrca = min(nodes, key=lambda n: n.level())
+        taxon_labels = [node.taxon.label for node in nodes if node.is_leaf()]
         tree_to_prune = dendropy.Tree(seed_node=copy.deepcopy(mrca),
-                                      taxon_namespace=copy.deepcopy(dendropy.TaxonNamespace()))
-        self.pruner.set_taxon_set(taxon_list)
+                                      taxon_namespace=dendropy.TaxonNamespace())
+        self.pruner.set_taxon_set(taxon_labels)
         self.pruner.prune(tree_to_prune)
+        tree_to_prune.purge_taxon_namespace()
+
         self.counter += 1
         if self.options.out_format == "newick":
             tree_to_prune.write(path=self.options.output + "/" + "tree" + "_" + str(self.counter) + ".tree",
@@ -93,9 +101,10 @@ class PatristicNeighbourhoodFinder(SubProcess):
 
     def search_the_neighborhood(self, node, previousNode, neighborhood, distance=0):
         if distance <= self.threshold:
+            neighborhood.add(node)
             for child in node.child_node_iter():
                 if child.is_leaf():
-                    neighborhood.add(child.taxon.label)
+                    neighborhood.add(child)
             for child in node.child_node_iter(lambda n: n is not previousNode):
                 self.searchForward(child, neighborhood, distance)
 
@@ -105,7 +114,7 @@ class PatristicNeighbourhoodFinder(SubProcess):
                 distance += node.edge.length
             if node.parent_node is not None:
                 self.search_the_neighborhood(node.parent_node, node, neighborhood, distance)
-        pass
+
 
     def searchForward(self, node, neighborhood, distance=0):
         if self.branch_count:
@@ -113,8 +122,9 @@ class PatristicNeighbourhoodFinder(SubProcess):
         else:
             distance += node.edge.length
         if distance <= self.threshold:
+            neighborhood.add(node)
             for child in node.child_node_iter():
                 if child.is_leaf():
-                    neighborhood.add(child.taxon.label)
+                    neighborhood.add(child)
                 else:
                     self.searchForward(child, neighborhood, distance)

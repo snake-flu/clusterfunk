@@ -81,6 +81,7 @@ class PruneProcess(SubProcess):
                                       taxon_namespace=copy.deepcopy(dendropy.TaxonNamespace()))
         self.pruner.set_taxon_set([taxon.label for taxon in subtree["taxa"]])
         self.pruner.prune(tree_to_prune)
+        tree_to_prune.purge_taxon_namespace()
         if self.options.out_format == "newick":
             tree_to_prune.write(path=self.options.output + "/" + self.options.trait + "_" + subtree["value"] + ".tree",
                                 schema=self.options.out_format, suppress_rooting=True)
