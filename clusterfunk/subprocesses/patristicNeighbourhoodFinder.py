@@ -33,7 +33,7 @@ class PatristicNeighbourhoodFinder(SubProcess):
     def run(self, tree, results=None):
 
         self.taxon_labels = self.taxa_parser.smart_parse(self.options)
-        self.eligible_taxa = self.taxon_labels
+        self.eligible_taxa = self.taxon_labels  # TODO make this more robust copy?
         self.tree = tree
         print("looking for %d taxa" % len(self.taxon_labels))
         i = 1
@@ -51,8 +51,8 @@ class PatristicNeighbourhoodFinder(SubProcess):
             else:
                 print("%s not found in tree" % taxon_label)
             sys.stdout.flush()
-            print("%s neighborhood size: %d" % (taxon_label, len(neighborhood)))
-            print("with %d tips" % (len([x for x in neighborhood if x.is_leaf()])))
+            # print("%s neighborhood size: %d" % (taxon_label, len(neighborhood)))
+            # print("with %d tips" % (len([x for x in neighborhood if x.is_leaf()])))
 
             i += 1
 
@@ -61,12 +61,23 @@ class PatristicNeighbourhoodFinder(SubProcess):
         while len(self.eligible_taxa) > 0:
             current_taxon = self.eligible_taxa.pop(0)
             self.current_taxon_set = self.neighbours[current_taxon]
-            self.rally_the_neighbors(current_taxon)
+            found_overlap = True
+            while found_overlap:
+                found_overlap = False
+                to_remove = []
+                for taxon2 in self.eligible_taxa:
+                    if len(self.current_taxon_set.intersection(self.neighbours[taxon2])) > 0:
+                        self.current_taxon_set = self.current_taxon_set.union(self.neighbours[taxon2])
+                        found_overlap = True
+                        to_remove.append(taxon2)
+                for over_lapping_taxon in to_remove:
+                    self.eligible_taxa.remove(over_lapping_taxon)
+
             self.taxon_sets.append(self.current_taxon_set)
 
-        print("found %d trees" % len(self.taxon_sets))
-        print("tips: %d and %d" % (len([x for x in self.taxon_sets[0] if x.is_leaf()]),
-                                   len([x for x in self.taxon_sets[1] if x.is_leaf()])))
+        # print("found %d trees" % len(self.taxon_sets))
+        # print("tips: %d and %d" % (len([x for x in self.taxon_sets[0] if x.is_leaf()]),
+        #                            len([x for x in self.taxon_sets[1] if x.is_leaf()])))
 
         if not os.path.exists(self.options.output):
             os.makedirs(self.options.output)
@@ -74,12 +85,6 @@ class PatristicNeighbourhoodFinder(SubProcess):
         with ThreadPool(self.options.threads) as pool:
             results.extend(pool.map(self.prune_lineage, self.taxon_sets))
 
-    def rally_the_neighbors(self, taxon1):
-        for taxon2 in self.eligible_taxa:
-            if len(self.neighbours[taxon1].intersection(self.neighbours[taxon2])) > 0:
-                self.current_taxon_set = self.current_taxon_set.union(self.neighbours[taxon2])
-                self.eligible_taxa.remove(taxon2)
-                self.rally_the_neighbors(taxon2)
 
     def prune_lineage(self, nodes):
         mrca = min(nodes, key=lambda n: n.level())
@@ -114,7 +119,6 @@ class PatristicNeighbourhoodFinder(SubProcess):
                 distance += node.edge.length
             if node.parent_node is not None:
                 self.search_the_neighborhood(node.parent_node, node, neighborhood, distance)
-
 
     def searchForward(self, node, neighborhood, distance=0):
         if self.branch_count:
