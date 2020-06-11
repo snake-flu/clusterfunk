@@ -1,5 +1,6 @@
 import copy
 import os
+import sys
 from multiprocessing.pool import ThreadPool
 
 import dendropy
@@ -15,6 +16,7 @@ class PatristicNeighbourhoodFinder(SubProcess):
 
         self.include_terminal_branch = options.include_terminal_branch if options.include_terminal_branch is not None else False
         self.threshold = options.threshold if options.threshold is not None else 0.00013
+        self.branch_count = options.threshold if options.threshold is not None else False
 
         self.taxon_labels = []
         self.taxon_sets = []
@@ -33,20 +35,25 @@ class PatristicNeighbourhoodFinder(SubProcess):
         self.taxon_labels = self.taxa_parser.smart_parse(self.options)
         self.eligible_taxa = self.taxon_labels
         self.tree = tree
-        pdm = tree.phylogenetic_distance_matrix()
-
+        print("looking for %d taxa" % len(self.taxon_labels))
+        i = 1
         for taxon_label in self.taxon_labels:
-            taxon = tree.find_node_with_taxon_label(taxon_label).taxon
-            self.neighbours[taxon_label] = {taxon_label}
-            for taxon2 in tree.taxon_namespace:
-                if taxon != taxon2:
-                    weighted_patristic_distance = pdm.patristic_distance(taxon, taxon2)
-                    if not self.include_terminal_branch:
-                        weighted_patristic_distance -= tree.find_node_with_taxon_label(taxon.label).edge.length
-                        weighted_patristic_distance -= tree.find_node_with_taxon_label(taxon2.label).edge.length
 
-                    if weighted_patristic_distance < self.threshold:
-                        self.neighbours[taxon_label].add(taxon2.label)
+            sys.stdout.write('\r')
+            sys.stdout.write(" %d%%" % (round((i / len(self.taxon_labels)) * 100)))
+
+            currentNode = tree.find_node_with_taxon_label(taxon_label)
+            if currentNode is not None:
+                neighborhood = set()
+                parent = currentNode.parent_node
+                self.search_the_neighborhood(parent, currentNode, neighborhood)
+                self.neighbours[taxon_label] = neighborhood
+            else:
+                print("%s not found in tree" % taxon_label)
+            sys.stdout.flush()
+            i += 1
+
+        sys.stdout.write("\n")
 
         while len(self.eligible_taxa) > 0:
             current_taxon = self.eligible_taxa.pop(0)
@@ -83,3 +90,31 @@ class PatristicNeighbourhoodFinder(SubProcess):
             tree_to_prune.write(path=self.options.output + "/" + "tree" + "_" + str(self.counter) + ".tree",
                                 schema=self.options.out_format)
         return
+
+    def search_the_neighborhood(self, node, previousNode, neighborhood, distance=0):
+        if distance <= self.threshold:
+            for child in node.child_node_iter():
+                if child.is_leaf():
+                    neighborhood.add(child.taxon.label)
+            for child in node.child_node_iter(lambda n: n is not previousNode):
+                self.searchForward(child, neighborhood, distance)
+
+            if self.branch_count:
+                distance += 1
+            else:
+                distance += node.edge.length
+            if node.parent_node is not None:
+                self.search_the_neighborhood(node.parent_node, node, neighborhood, distance)
+        pass
+
+    def searchForward(self, node, neighborhood, distance=0):
+        if self.branch_count:
+            distance += 1
+        else:
+            distance += node.edge.length
+        if distance <= self.threshold:
+            for child in node.child_node_iter():
+                if child.is_leaf():
+                    neighborhood.add(child.taxon.label)
+                else:
+                    self.searchForward(child, neighborhood, distance)

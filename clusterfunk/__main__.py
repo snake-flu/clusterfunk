@@ -624,6 +624,13 @@ def main(args=None):
             help="Boolean flag stating the terminal branchlengths should be included in the distances. Defualt is "
                  "False, only distances along internal branches count. "
     )
+    subparser_find_catchments.add_argument(
+            "--branch-count",
+            dest="branch_count",
+            action="store_true",
+            default=False,
+            help="Boolean flag stating that the threshold refers to the number of branches traversed not their length. "
+    )
     taxon_set_files = subparser_find_catchments.add_mutually_exclusive_group(required=True)
 
     taxon_set_files.add_argument(
