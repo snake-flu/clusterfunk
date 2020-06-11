@@ -602,6 +602,19 @@ def main(args=None):
     )
     subparser_sort.set_defaults(subprocess=clusterfunk.subprocesses.sort.Sorter)
 
+    # ------------------------------root-----------------------------#
+    subparser_root = subparsers.add_parser(
+            "root",
+            usage="clusterfunk root -i my.tree -o my.rooted.tree --outgroup my_outgroup_taxon --in-format nexus --out-format newick",
+            help="reroot the tree such that a particular node is moved to the outgroup position",
+            parents=[shared_arguments_parser]
+    )
+    subparser_root.add_argument(
+            "--outgroup",
+            type=str,
+            help="the name of the taxon to move to an outgroup position")
+    subparser_root.set_defaults(subprocess=clusterfunk.subprocesses.root.Rooter)
+
     # ------------------------------find catchments-----------------------------#
     subparser_find_catchments = subparsers.add_parser(
             "find_catchments",
