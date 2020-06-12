@@ -615,24 +615,24 @@ def main(args=None):
             help="the name of the taxon to move to an outgroup position")
     subparser_root.set_defaults(subprocess=clusterfunk.subprocesses.root.Rooter)
 
-    # ------------------------------summarize polytomy-----------------------------#
-    subparser_summarize_polytomies = subparsers.add_parser(
-            "summarize_polytomies",
-            usage="clusterfunk summarize_polytomies -i my.tree -o smaller.tree [--tsv_file <output.tsv>] [<taxon "
+    # ------------------------------focus-----------------------------#
+    subparser_focus = subparsers.add_parser(
+            "focus",
+            usage="clusterfunk focus -i my.tree -o smaller.tree [--tsv_file <output.tsv>] [<taxon "
                   "parsing options>] ",
-            help="This function takes in a tree and an optional taxon list. It traverses to the tree and collapses "
-                 "any external nodes on polytomy into a single node with an edge length equal to the mean of the "
+            help="This function takes in a tree and protected taxon list. It traverses to the tree and collapses "
+                 "any clades that do not contain a protected taxon"
                  "removed nodes. Taxon defined in the list are not removed. There is an option to output a tsv "
                  "including a list of all the removed nodes ",
             parents=[shared_arguments_parser]
     )
 
-    subparser_summarize_polytomies.add_argument(
+    subparser_focus.add_argument(
             "--output-tsv",
             dest="tsv_file",
             help="output tsv file with nodes that map to each inserted node."
     )
-    taxon_set_files = subparser_summarize_polytomies.add_argument_group("taxon list")
+    taxon_set_files = subparser_focus.add_mutually_exclusive_group(required=True)
 
     taxon_set_files.add_argument(
             "--fasta",
@@ -647,22 +647,22 @@ def main(args=None):
             help="incoming csv/tsv file defining taxon set."
     )
 
-    meta_data_options = subparser_summarize_polytomies.add_argument_group("metadata options")
+    meta_data_options = subparser_focus.add_argument_group("metadata options")
 
     meta_data_options.add_argument(
             "--index-column",
             dest="index_column",
             help="column of metadata that holds the taxon names"
     )
-    subparser_summarize_polytomies.add_argument(
+    subparser_focus.add_argument(
             "--parse-data-key",
             dest="data_taxon_pattern",
             metavar="<regex>",
             default="(.*)",
             help="regex defined group(s) to construct keys from the data file to match the taxon labels"
     )
-    subparser_summarize_polytomies.set_defaults(
-        subprocess=clusterfunk.subprocesses.polytomySummarizer.PolytomySummarizer)
+    subparser_focus.set_defaults(
+            subprocess=clusterfunk.subprocesses.treeFocuser.TreeFocuser)
 
     # ------------------------------find catchments-----------------------------#
     subparser_find_catchments = subparsers.add_parser(
