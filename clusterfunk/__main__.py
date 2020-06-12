@@ -188,26 +188,39 @@ def main(args=None):
     subparser_relabel.add_argument(
             "--separator",
             type=str,
-            default="|",
-            help="separate feilds in name"
+        default="|",
+        help="separate feilds in name"
     )
 
     subparser_relabel.add_argument(
-            "--replace",
-            action="store_true",
-            default=False,
-            help="replace tip label instead of appending to it, default is False"
+        "--replace",
+        action="store_true",
+        default=False,
+        help="replace tip label instead of appending to it, default is False"
     )
-
+    subparser_relabel.add_argument(
+        "--parse-taxon-key",
+        dest="parse_taxon",
+        metavar="<regex>",
+        default="(.*)",
+        help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
+    )
+    subparser_relabel.add_argument(
+        "--from-label",
+        dest="from_label",
+        action="store_true",
+        default=False,
+        help="boolean flag to replace current label with regex groups and separator defined by parse-taxon key and separator"
+    )
     from_annotations_group = subparser_relabel.add_argument_group("Renaming with annotations")
     from_metadata = subparser_relabel.add_argument_group("Renaming from metadata file")
 
     from_annotations_group.add_argument(
-            "--from-traits",
-            nargs="+",
-            dest="from_traits",
-            metavar="<[traits]>",
-            help="Space separated list of traits."
+        "--from-traits",
+        nargs="+",
+        dest="from_traits",
+        metavar="<[traits]>",
+        help="Space separated list of traits."
     )
 
     from_metadata.add_argument(
@@ -237,13 +250,7 @@ def main(args=None):
             default="(.*)",
             help="regex defined group(s) to construct keys from the data file to match the taxon labels"
     )
-    from_metadata.add_argument(
-            "--parse-taxon-key",
-            dest="parse_taxon",
-            metavar="<regex>",
-            default="(.*)",
-            help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
-    )
+
     subparser_relabel.set_defaults(subprocess=clusterfunk.subprocesses.relabel_tips.TipLabeler)
 
     # _____________________________ Ancestral reconstruction ______________________________#

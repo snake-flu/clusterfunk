@@ -27,11 +27,13 @@ class TipLabeler(SubProcess):
 
         elif self.options.from_traits is not None:
             self.relabel_tips_from_traits(tree, self.options.from_traits)
+        elif self.options.from_label is not None:
+            self.relabel_tips_from_label(tree)
 
         else:
             sys.exit("No trait names or meta data provided. exiting")
 
-    def taxon_parser(self, taxon_label):
+    def taxon_parser(self, taxon_label, sep=""):
         """
         Method that converts a taxon label into the string expected in the metatdata
         :param taxon_label:
@@ -40,7 +42,7 @@ class TipLabeler(SubProcess):
         match = self.taxon_regex.match(taxon_label)
         if not match:
             raise ValueError("taxon name %s in tree file does not match regex pattern" % taxon_label)
-        return "".join(match.groups())
+        return sep.join(match.groups())
 
     def relabel_tips_from_traits(self, tree, traitNames):
         """
@@ -75,7 +77,7 @@ class TipLabeler(SubProcess):
         :return:
         """
         node = tree.find_node_with_taxon(
-                lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
+            lambda taxon: True if self.taxon_parser(taxon.label) == tip_label else False)
         if node is None:
             warnings.warn("Taxon: %s not found in tree" % tip_label, UserWarning)
         else:
@@ -84,3 +86,7 @@ class TipLabeler(SubProcess):
                 node.taxon.label = new_label
             else:
                 node.taxon.label = node.taxon.label + self.separator + new_label
+
+    def relabel_tips_from_label(self, tree):
+        for tip in tree.leaf_node_iter():
+            tip.taxon.label = self.taxon_parser(tip.taxon.label, self.separator)
