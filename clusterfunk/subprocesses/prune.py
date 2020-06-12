@@ -92,3 +92,4 @@ class PruneProcess(SubProcess):
 
     def cleanup(self, tree):
         tree.purge_taxon_namespace()
+        tree.seed_node.edge.length = None

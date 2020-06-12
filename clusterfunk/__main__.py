@@ -613,6 +613,13 @@ def main(args=None):
             "--outgroup",
             type=str,
             help="the name of the taxon to move to an outgroup position")
+
+    # subparser_root.add_argument(
+    #         "--unroot",
+    #         action="store_true",
+    #         default=False,
+    #         help="Unroot a rooted tree. Push the root to a polytomy."
+    #         )
     subparser_root.set_defaults(subprocess=clusterfunk.subprocesses.root.Rooter)
 
     # ------------------------------focus-----------------------------#

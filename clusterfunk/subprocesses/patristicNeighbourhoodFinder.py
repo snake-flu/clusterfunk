@@ -94,6 +94,7 @@ class PatristicNeighbourhoodFinder(SubProcess):
         self.pruner.set_taxon_set(taxon_labels)
         self.pruner.prune(tree_to_prune)
         tree_to_prune.purge_taxon_namespace()
+        tree_to_prune.seed_node.edge.length = None
 
         self.counter += 1
         if self.options.out_format == "newick":
