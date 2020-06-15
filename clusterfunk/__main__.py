@@ -188,39 +188,39 @@ def main(args=None):
     subparser_relabel.add_argument(
             "--separator",
             type=str,
-        default="|",
-        help="separate feilds in name"
+            default="|",
+            help="separate feilds in name"
     )
 
     subparser_relabel.add_argument(
-        "--replace",
-        action="store_true",
-        default=False,
-        help="replace tip label instead of appending to it, default is False"
+            "--replace",
+            action="store_true",
+            default=False,
+            help="replace tip label instead of appending to it, default is False"
     )
     subparser_relabel.add_argument(
-        "--parse-taxon-key",
-        dest="parse_taxon",
-        metavar="<regex>",
-        default="(.*)",
-        help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
+            "--parse-taxon-key",
+            dest="parse_taxon",
+            metavar="<regex>",
+            default="(.*)",
+            help="regex defined group(s) to construct keys from the taxon labels to match the data file keys"
     )
     subparser_relabel.add_argument(
-        "--from-label",
-        dest="from_label",
-        action="store_true",
-        default=False,
-        help="boolean flag to replace current label with regex groups and separator defined by parse-taxon key and separator"
+            "--from-label",
+            dest="from_label",
+            action="store_true",
+            default=False,
+            help="boolean flag to replace current label with regex groups and separator defined by parse-taxon key and separator"
     )
     from_annotations_group = subparser_relabel.add_argument_group("Renaming with annotations")
     from_metadata = subparser_relabel.add_argument_group("Renaming from metadata file")
 
     from_annotations_group.add_argument(
-        "--from-traits",
-        nargs="+",
-        dest="from_traits",
-        metavar="<[traits]>",
-        help="Space separated list of traits."
+            "--from-traits",
+            nargs="+",
+            dest="from_traits",
+            metavar="<[traits]>",
+            help="Space separated list of traits."
     )
 
     from_metadata.add_argument(
@@ -293,19 +293,31 @@ def main(args=None):
             help="the traits whose values will be reconstructed"
     )
     subparser_ancestral_reconstruction.add_argument(
-            '--ancestral_state',
-            metavar='ancestral_state',
+            '--ancestral-state',
+            dest='ancestral_state',
             action='store',
             nargs="+",
             help="Option to set the ancestral state for the tree. In same order of traits")
     subparser_ancestral_reconstruction.add_argument(
-            '--majority_rule',
+            '--majority-rule',
+            dest="majority-rule",
             action='store_true',
             default=False,
             help="A Boolean flag. In first stage of the Fitch algorithm, at a polytomy, when there is no intersection of traits from all children"
                  "should the trait that appears most in the children"
                  "be assigned. Default:False - the union of traits are assigned"
     )
+
+    subparser_ancestral_reconstruction.add_argument(
+            '--polytomy-tie-break',
+            dest="polytomy_tie_break",
+            nargs="+",
+            default=None,
+            help="A list of trait values giving the precedence for what traits should be assigned at polytomies."
+                 "Values not listed will be overlooked. Default behavior is to treat polytomies like a bifurcating node "
+                 "and assign the union of child sets, when no iterestion exists. "
+    )
+
     subparser_ancestral_reconstruction.set_defaults(
             subprocess=clusterfunk.subprocesses.ancestral_reconstruction.AncestorReconstructor)
 
@@ -466,12 +478,20 @@ def main(args=None):
             default="",
             help="output annotation value prefix, default is \'\'"
     )
-    subparser_merge_transitions.add_argument(
+    rubric = subparser_merge_transitions.add_mutually_exclusive_group(required=True)
+    rubric.add_argument(
             "--max-merge",
             dest="max_merge",
-            default=1,
+            default=0,
             type=int,
             help="The number of merges allowed on the path to the root from each merger"
+    )
+    rubric.add_argument(
+            "--merge-sibling-singletons",
+            dest="merge_sibling_singletons",
+            default=False,
+            action="store_true",
+            help="Boolean flag to merge sibling singleton tips."
     )
     subparser_merge_transitions.set_defaults(subprocess=clusterfunk.subprocesses.merge_transitions.MergeTransitions)
 
@@ -686,7 +706,6 @@ def main(args=None):
                  "return subtrees containing all tips within a set threshold. Overlapping catchments are merged.",
             parents=[shared_arguments_parser]
     )
-
 
     subparser_find_catchments.add_argument(
             "--threshold",

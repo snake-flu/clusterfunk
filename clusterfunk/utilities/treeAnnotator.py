@@ -1,3 +1,4 @@
+import math
 import re
 import warnings
 
@@ -5,11 +6,12 @@ from clusterfunk.utilities.utils import check_str_for_bool, safeNodeAnnotator
 
 
 class TreeAnnotator:
-    def __init__(self, tree, taxon_regex=re.compile("(.*)"), majority_rule=False):
+    def __init__(self, tree, taxon_regex=re.compile("(.*)"), majority_rule=False, polytomy_tie_breaker=None):
         self.tree = tree
         self.root = tree.seed_node
         self.majority_rule = majority_rule
         self.taxon_regex = taxon_regex
+        self.polytomy_tie_breaker = polytomy_tie_breaker
         pass
 
     def taxon_parser(self, taxon_label):
@@ -82,7 +84,7 @@ class TreeAnnotator:
             safeNodeAnnotator.annotate(mrca, "%s-mrca" % trait_name, value)
         return mrca
 
-    def fitch_parsimony(self, node, name):
+    def fitch_parsimony(self, node, name, polytomy_behavior=None):
         if len(node.child_nodes()) == 0:
             tip_annotation = node.annotations.get_value(name) if node.annotations.get_value(name) is not None else []
             return tip_annotation if isinstance(tip_annotation, list) else [tip_annotation]
@@ -113,6 +115,15 @@ class TreeAnnotator:
 
                 safeNodeAnnotator.annotate(node, "children_" + name, unique_states)
                 safeNodeAnnotator.annotate(node, "children_" + name + "_counts", state_counts)
+        elif self.polytomy_tie_breaker is not None and len(intersection) == 0 and node.num_child_nodes() > 2:
+            # print("polytomy states :")
+            # print(list(union))
+            if any([state in self.polytomy_tie_breaker for state in list(union)]):
+                sorted_states = sorted(list(union), key=lambda state: self.polytomy_tie_breaker.index(
+                        state) if state in self.polytomy_tie_breaker else math.inf)
+                # print("sorted States: ")
+                # print(sorted_states)
+                value = [sorted_states[0]]  # highest rated state in union
 
         safeNodeAnnotator.annotate(node, name, value[0] if len(value) == 1 else value)
 

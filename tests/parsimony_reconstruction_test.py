@@ -3,7 +3,7 @@ import unittest
 
 import dendropy
 
-from clusterfunk import annotate_tree
+from clusterfunk.utilities.treeAnnotator import TreeAnnotator
 from clusterfunk.utilities.utils import prepare_tree
 
 this_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +20,7 @@ class Options:
 class TestFitch(unittest.TestCase):
     def setUp(self):
         tree = dendropy.Tree.get_from_string("(A:1,(B:1,(C:1,(D:1,E:1):1):1):1);", "newick")
-        self.PR = annotate_tree.TreeAnnotator(tree)
+        self.PR = TreeAnnotator(tree)
 
     def test_annotations(self):
         self.PR.annotate_node("A", {"UK": False})
@@ -84,7 +84,7 @@ class TestFitch(unittest.TestCase):
     def test_polytomy(self):
         text = "(A[&t=1]:1,(B[&t=1]:1,(C[&t=1]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
         polytomy = dendropy.Tree.get_from_string(text, "newick")
-        annotator = annotate_tree.TreeAnnotator(polytomy)
+        annotator = TreeAnnotator(polytomy)
         annotator.fitch_parsimony(polytomy.seed_node, "t")
         self.assertCountEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"),
                               ["1", "2"])
@@ -92,26 +92,33 @@ class TestFitch(unittest.TestCase):
     def test_polytomy_majority(self):
         text = "(A[&t=1]:1,(B[&t=1]:1,(C[&t=1]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
         polytomy = dendropy.Tree.get_from_string(text, "newick")
-        annotator = annotate_tree.TreeAnnotator(polytomy, majority_rule=True)
+        annotator = TreeAnnotator(polytomy, majority_rule=True)
         annotator.fitch_parsimony(polytomy.seed_node, "t")
         self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "1")
+
+    def test_polytomy_tie_break(self):
+        text = "(A[&t=1]:1,(B[&t=1]:1,(C[&t=1]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
+        polytomy = dendropy.Tree.get_from_string(text, "newick")
+        annotator = TreeAnnotator(polytomy, polytomy_tie_breaker=["2", "1"])
+        annotator.fitch_parsimony(polytomy.seed_node, "t")
+        self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "2")
 
     def test_polytomy_maxtrans(self):
         text = "(A[&t=2]:1,(B[&t=2]:1,(C[&t=2]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
         polytomy = dendropy.Tree.get_from_string(text, "newick")
-        annotator = annotate_tree.TreeAnnotator(polytomy, False)
+        annotator = TreeAnnotator(polytomy, False)
         annotator.annotate_nodes_from_tips("t", True, "2", "1")
         self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "1")
 
     def test_polytomy_maxtrans_nogo(self):
         text = "(A[&t=2]:1,(B[&t=2]:1,(C[&t=2]:1,(D[&t=1]:1,E[&t=1]:1,G[&t=2]:1):1):1):1);"
         polytomy = dendropy.Tree.get_from_string(text, "newick")
-        annotator = annotate_tree.TreeAnnotator(polytomy, False)
+        annotator = TreeAnnotator(polytomy, False)
         annotator.annotate_nodes_from_tips("t", True, "2", "3")
         self.assertEqual(polytomy.find_node_with_taxon_label("D").parent_node.annotations.get_value("t"), "2")
 
     def test_what_went_wrong(self):
         maxtransOptions = Options()
         tree = prepare_tree(maxtransOptions)
-        annotator = annotate_tree.TreeAnnotator(tree, False)
+        annotator = TreeAnnotator(tree, False)
         annotator.annotate_nodes_from_tips("country_uk_maxtran", True, "True", "False")

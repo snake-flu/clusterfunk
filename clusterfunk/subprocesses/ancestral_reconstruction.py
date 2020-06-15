@@ -12,6 +12,8 @@ class AncestorReconstructor(SubProcess):
     def __init__(self, options):
         super().__init__(options)
         self.acctran = True if options.acctran else False
+        self.polytomy_tie_breaker = [check_str_for_bool(x) for x in
+                                     options.polytomy_tie_break] if options.polytomy_tie_break is not None else None
 
     def run(self, tree):
         """
@@ -19,7 +21,8 @@ class AncestorReconstructor(SubProcess):
         :param tree:
         :return:
         """
-        annotator = TreeAnnotator(tree)
+
+        annotator = TreeAnnotator(tree, polytomy_tie_breaker=self.polytomy_tie_breaker)
 
         if len(self.options.traits) > 0:
             i = 0
