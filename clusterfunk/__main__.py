@@ -493,6 +493,13 @@ def main(args=None):
             action="store_true",
             help="Boolean flag to merge sibling singleton tips."
     )
+    rubric.add_argument(
+            "--merge-siblings",
+            dest="merge_siblings",
+            default=False,
+            action="store_true",
+            help="Boolean flag to merge sibling transitions"
+    )
     subparser_merge_transitions.set_defaults(subprocess=clusterfunk.subprocesses.merge_transitions.MergeTransitions)
 
     # _____________________________ prune ______________________________#

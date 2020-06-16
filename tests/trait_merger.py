@@ -7,12 +7,13 @@ from clusterfunk.utilities.merger import Merger
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
-        tree_string="((A[&t=1],(A1[&t=2],A2[&t=3],B),A3[&t=4]),(C[&t=5],D));"
-        self.tree = dendropy.Tree.get(data=tree_string,schema="newick")
+        tree_string = "((A[&t=1],(A1[&t=2],A2[&t=3],B),A3[&t=10],(A5[&t=4],A4[&t=4])[&t=4]),(C[&t=5],D));"
+        self.tree = dendropy.Tree.get(data=tree_string, schema="newick")
         self.A = self.tree.find_node_with_taxon_label("A")
         self.A1 = self.tree.find_node_with_taxon_label("A1")
         self.A2 = self.tree.find_node_with_taxon_label("A2")
         self.A3 = self.tree.find_node_with_taxon_label("A3")
+        self.A5 = self.tree.find_node_with_taxon_label("A5")
         self.C = self.tree.find_node_with_taxon_label("C")
     def test_merge(self):
         merger = Merger("t","lineage")
@@ -47,6 +48,21 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(self.A.annotations.get_value("lineage"), self.A3.annotations.get_value("lineage"))
         self.assertEqual(self.A1.annotations.get_value("lineage"), self.A2.annotations.get_value("lineage"))
+
+    def test_merge_siblings(self):
+        merger = Merger("t", "lineage", merge_siblings=True)
+        merger.merge(self.tree)
+
+        self.assertNotEqual(self.A1.annotations.get_value("lineage"), self.A3.annotations.get_value("lineage"))
+        self.assertNotEqual(self.A1.annotations.get_value("lineage"), self.C.annotations.get_value("lineage"))
+        self.assertIsNotNone(self.C.annotations.get_value("lineage"))
+
+        self.assertNotEqual(self.A.annotations.get_value("lineage"), self.A2.annotations.get_value("lineage"))
+        self.assertNotEqual(self.A.annotations.get_value("lineage"), self.C.annotations.get_value("lineage"))
+
+        self.assertEqual(self.A.annotations.get_value("lineage"), self.A3.annotations.get_value("lineage"))
+        self.assertEqual(self.A1.annotations.get_value("lineage"), self.A2.annotations.get_value("lineage"))
+        self.assertEqual(self.A3.annotations.get_value("lineage"), self.A5.annotations.get_value("lineage"))
 
 
 if __name__ == '__main__':

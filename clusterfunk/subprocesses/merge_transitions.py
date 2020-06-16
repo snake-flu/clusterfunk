@@ -14,7 +14,8 @@ class MergeTransitions(SubProcess):
                              options.merged_trait_name,
                              prefix=options.prefix,
                              max_merge=options.max_merge,
-                             merge_identical_samples=options.merge_sibling_singletons)
+                             merge_identical_samples=options.merge_sibling_singletons,
+                             merge_siblings=options.merge_siblings)
 
     def run(self, tree):
         self.merger.merge(tree)

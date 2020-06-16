@@ -65,8 +65,14 @@ class TipLabeler(SubProcess):
         :param annotations:
         :return:
         """
-        for tip_label in annotations:
-            self.relabel_tip(tree, tip_label, annotations[tip_label])
+        for tip in tree.leaf_node_iter():
+            tip_label = self.taxon_parser(tip.taxon.label)
+            if tip_label in annotations:
+                new_label = self.separator.join([str(annotations[tip_label][x]) for x in annotations[tip_label]])
+                if self.replace:
+                    tip.taxon.label = new_label
+                else:
+                    tip.taxon.label = tip.taxon.label + self.separator + new_label
 
     def relabel_tip(self, tree, tip_label, annotation_values):
         """
