@@ -24,8 +24,6 @@ class PatristicNeighbourhoodFinder(SubProcess):
         self.current_taxon_set = set()
         self.neighbours = {}
         self.tree = None
-
-        self.pruner = TreePruner(extract=True)
         self.taxa_parser = TaxaFileParser(options.data_taxon_pattern)
         self.counter = 0
         self.handleOwnOutput = True
@@ -83,16 +81,17 @@ class PatristicNeighbourhoodFinder(SubProcess):
             os.makedirs(self.options.output)
         results = []
         with ThreadPool(self.options.threads) as pool:
-            results.extend(pool.map(self.prune_lineage, self.taxon_sets))
+            results.extend(pool.map(self.thread_prune, self.taxon_sets))
 
-
-    def prune_lineage(self, nodes):
+    def thread_prune(self, nodes):
         mrca = min(nodes, key=lambda n: n.level())
         taxon_labels = [node.taxon.label for node in nodes if node.is_leaf()]
         tree_to_prune = dendropy.Tree(seed_node=copy.deepcopy(mrca),
                                       taxon_namespace=dendropy.TaxonNamespace())
-        self.pruner.set_taxon_set(taxon_labels)
-        self.pruner.prune(tree_to_prune)
+
+        thread_pruner = TreePruner(extract=True)
+        thread_pruner.set_taxon_set(taxon_labels)
+        thread_pruner.prune(tree_to_prune)
         tree_to_prune.purge_taxon_namespace()
         tree_to_prune.seed_node.edge.length = None
 

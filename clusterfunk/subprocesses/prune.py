@@ -74,9 +74,9 @@ class PruneProcess(SubProcess):
         print("starting to prune")
         results = []
         with ThreadPool(self.options.threads) as pool:
-            results.extend(pool.map(self.prune_lineage, subtrees))
+            results.extend(pool.map(self.thread_prune, subtrees))
 
-    def prune_lineage(self, subtree):
+    def thread_prune(self, subtree):
         tree_to_prune = dendropy.Tree(seed_node=copy.deepcopy(subtree["mrca"]),
                                       taxon_namespace=dendropy.TaxonNamespace())
 
