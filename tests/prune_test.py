@@ -1,10 +1,11 @@
+import copy
 import os
 import re
 import unittest
 
 import dendropy
 
-from clusterfunk.prune import TreePruner
+from clusterfunk.utilities.treePruner import TreePruner
 
 this_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 data_dir = os.path.join(this_dir, "tests", 'data', 'prune')
@@ -44,7 +45,6 @@ class Prune_tests(unittest.TestCase):
         pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), False)
         pruner.set_taxon_set(["A", "A2"])
         pruner.prune(self.tree)
-        self.tree.purge_taxon_namespace()
 
         self.assertEqual([taxon.label for taxon in self.tree.taxon_set], ["B", "C"])
 
@@ -52,9 +52,41 @@ class Prune_tests(unittest.TestCase):
         pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), True)
         pruner.set_taxon_set(["A", "A2"])
         pruner.prune(self.tree)
-        self.tree.purge_taxon_namespace()
         print(self.tree.as_ascii_plot())
+
         self.assertEqual([taxon.label for taxon in self.tree.taxon_set], ["A", "A2"])
+
+    def test_multiplePrune(self):
+        pruner = TreePruner(re.compile("(.*)"), re.compile("(.*)"), True)
+
+        pruner.set_taxon_set(["B", "C"])
+        mrca = self.tree.mrca(taxa=[n.taxon for n in self.tree.leaf_node_iter() if n.taxon.label in ["B", "C"]])
+        tree_to_prune2 = dendropy.Tree(seed_node=copy.deepcopy(mrca),
+                                       taxon_namespace=dendropy.TaxonNamespace())
+
+        pruner.prune(tree_to_prune2)
+
+        pruner.set_taxon_set(["A", "A2"])
+
+        mrca = self.tree.mrca(taxa=[n.taxon for n in self.tree.leaf_node_iter() if n.taxon.label in ["A", "A2"]])
+        tree_to_prune = dendropy.Tree(seed_node=copy.deepcopy(mrca),
+                                      taxon_namespace=dendropy.TaxonNamespace())
+        pruner.prune(tree_to_prune)
+        self.assertEqual([taxon.label for taxon in tree_to_prune.taxon_namespace], ["A", "A2"])
+
+        pruner.set_taxon_set(["B", "C"])
+        mrca = self.tree.mrca(taxa=[n.taxon for n in self.tree.leaf_node_iter() if n.taxon.label in ["B", "C"]])
+        tree_to_prune2 = dendropy.Tree(seed_node=copy.deepcopy(mrca),
+                                       taxon_namespace=dendropy.TaxonNamespace())
+
+        pruner.prune(tree_to_prune2)
+
+        self.assertEqual([taxon.label for taxon in tree_to_prune2.taxon_namespace], ["B", "C"])
+
+        self.assertEqual([taxon.label for taxon in self.tree.taxon_namespace], ["A", "B", "A2", "C"])
+
+    # def test_prune_by_triats(self):
+
 
 if __name__ == '__main__':
     unittest.main()

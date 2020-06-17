@@ -56,12 +56,16 @@ class TreePruner:
                 if matcher.match(tip.annotations.get_value(trait_name)):
                     self.taxon_set.append(self.parse_data_taxon(tip.taxon.label))
 
+
     def prune(self, tree):
         taxa_labels = [tip.taxon.label for tip in tree.leaf_node_iter() if
                        self.parse_tree_taxon(tip.taxon.label) in self.taxon_set]
+
         if self.extract:
             tree.retain_taxa_with_labels(taxa_labels)
         else:
             tree.prune_taxa_with_labels(taxa_labels)
+        tree.purge_taxon_namespace()
+        tree.seed_node.edge.length = None
 
         return tree

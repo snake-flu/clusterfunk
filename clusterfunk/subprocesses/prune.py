@@ -78,10 +78,15 @@ class PruneProcess(SubProcess):
 
     def prune_lineage(self, subtree):
         tree_to_prune = dendropy.Tree(seed_node=copy.deepcopy(subtree["mrca"]),
-                                      taxon_namespace=copy.deepcopy(dendropy.TaxonNamespace()))
-        self.pruner.set_taxon_set([taxon.label for taxon in subtree["taxa"]])
-        self.pruner.prune(tree_to_prune)
-        tree_to_prune.purge_taxon_namespace()
+                                      taxon_namespace=dendropy.TaxonNamespace())
+
+        thread_pruner = TreePruner(re.compile(self.options.parse_data),
+                                   re.compile(self.options.parse_taxon),
+                                   self.options.extract)
+
+        thread_pruner.set_taxon_set([taxon.label for taxon in subtree["taxa"]])
+
+        thread_pruner.prune(tree_to_prune)
         if self.options.out_format == "newick":
             tree_to_prune.write(path=self.options.output + "/" + self.options.trait + "_" + subtree["value"] + ".tree",
                                 schema=self.options.out_format, suppress_rooting=True)
@@ -89,7 +94,3 @@ class PruneProcess(SubProcess):
             tree_to_prune.write(path=self.options.output + "/" + self.options.trait + "_" + subtree["value"] + ".tree",
                                 schema=self.options.out_format)
         return subtree["value"]
-
-    def cleanup(self, tree):
-        tree.purge_taxon_namespace()
-        tree.seed_node.edge.length = None
