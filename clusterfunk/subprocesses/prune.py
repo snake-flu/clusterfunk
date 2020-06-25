@@ -56,7 +56,7 @@ class PruneProcess(SubProcess):
         values = Counter([tip.annotations.get_value(self.options.trait) for tip in self.tree.leaf_node_iter() if
                           tip.annotations.get_value(self.options.trait) is not None])
 
-        above_threshold = [element for element, count in values.items() if count > self.options.threshold]
+        above_threshold = [element for element, count in values.items() if count >= self.options.threshold]
 
         print("expecting %d trees" % len(above_threshold))
         subtrees = []

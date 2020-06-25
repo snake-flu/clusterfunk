@@ -536,6 +536,7 @@ def main(args=None):
             "--threshold",
             dest="threshold",
             default=2,
+            type=int,
             help="If using 'trait' each subtree must have at least this many tips. Default 2."
     )
 
