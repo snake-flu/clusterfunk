@@ -532,7 +532,7 @@ def main(args=None):
             help="A discrete trait. The tree will be pruned the tree for each value of the trait. In this case the"
                  " output will be interpreted as a directory."
     )
-    taxon_set_files.add_argument(
+    subparser_prune.add_argument(
             "--threshold",
             dest="threshold",
             default=2,
