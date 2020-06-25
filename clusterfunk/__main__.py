@@ -532,6 +532,12 @@ def main(args=None):
             help="A discrete trait. The tree will be pruned the tree for each value of the trait. In this case the"
                  " output will be interpreted as a directory."
     )
+    taxon_set_files.add_argument(
+            "--threshold",
+            dest="threshold",
+            default=2,
+            help="If using 'trait' each subtree must have at least this many tips. Default 2."
+    )
 
     taxon_set_files.add_argument(
             "--where-trait",

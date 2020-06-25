@@ -56,12 +56,12 @@ class PruneProcess(SubProcess):
         values = Counter([tip.annotations.get_value(self.options.trait) for tip in self.tree.leaf_node_iter() if
                           tip.annotations.get_value(self.options.trait) is not None])
 
-        no_singletons = [element for element, count in values.items() if count > 1]
+        above_threshold = [element for element, count in values.items() if count > self.options.threshold]
 
-        print("expecting %d trees" % len(no_singletons))
+        print("expecting %d trees" % len(above_threshold))
         subtrees = []
         mrcas = []
-        for value in no_singletons:
+        for value in above_threshold:
             taxa = [n.taxon for n in
                     self.tree.leaf_node_iter(lambda n: n.annotations.get_value(self.options.trait) == value)]
             mrca = self.tree.mrca(taxa=taxa)
