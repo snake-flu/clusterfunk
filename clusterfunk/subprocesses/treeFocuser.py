@@ -43,14 +43,26 @@ class TreeFocuser(SubProcess):
 
         removed_labels = []
         to_be_removed = []
+
+        number_of_disappointing_leafs = len(
+                [child for child in node.child_node_iter(lambda n: n not in self.protected_ancestor and n.is_leaf())])
+
         for disappointing_child in node.child_node_iter(lambda n: n not in self.protected_ancestor):
-            if disappointing_child.is_leaf():
-                removed_labels.append(disappointing_child.taxon.label)
-            else:
-                for leaf in disappointing_child.leaf_iter():
-                    removed_labels.append(leaf.taxon.label)
-                    # to_be_removed.append(disappointing_child)
-            to_be_removed.append(disappointing_child)
+
+            # How many are leafs? if above threshold collapse
+            if number_of_disappointing_leafs > self.options.collapse_threshold:
+                if disappointing_child.is_leaf():
+                    removed_labels.append(disappointing_child.taxon.label)
+                    to_be_removed.append(disappointing_child)
+
+            if not disappointing_child.is_leaf():
+                # How many are leafs? if above threshold collapse
+                number_of_disappointing_descendents = len([child for child in disappointing_child.leaf_iter()])
+                if number_of_disappointing_descendents > self.options.collapse_threshold:
+                    for leaf in disappointing_child.leaf_iter():
+                        removed_labels.append(leaf.taxon.label)
+                        # to_be_removed.append(disappointing_child)
+                    to_be_removed.append(disappointing_child)
 
         if len(to_be_removed) > 0:
             for disappointing_child in to_be_removed:
@@ -64,3 +76,4 @@ class TreeFocuser(SubProcess):
 
         for favorite_child in node.child_node_iter():
             self.collapse_chaff(favorite_child)
+

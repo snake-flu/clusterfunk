@@ -680,6 +680,14 @@ def main(args=None):
             dest="tsv_file",
             help="output tsv file with nodes that map to each inserted node."
     )
+
+    subparser_focus.add_argument(
+            "--threshold",
+            dest="collapse_threshold",
+            default=1,
+            type=int,
+            help="collapse clades that do not include the protected taxa and have more than this number of tips. Default 1."
+    )
     taxon_set_files = subparser_focus.add_mutually_exclusive_group(required=True)
 
     taxon_set_files.add_argument(
