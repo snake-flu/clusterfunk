@@ -39,8 +39,10 @@ class TreeAnnotator:
             self.add_boolean(node, trait, boolean_trait_name, regex)
 
     def annotate_tips(self, annotations):
-        for tip_label in annotations:
-            self.annotate_node(tip_label, annotations[tip_label])
+        for node in self.tree.leaf_node_iter():
+            for ak, av in annotations.get(node.taxon.label, {}).items():
+                if av and (type(av) is str and len(av) > 0) or type(av) is not str:
+                    safeNodeAnnotator.annotate(node, ak, check_str_for_bool(av))
 
     def add_boolean(self, node, trait, boolean_trait_name, regex):
 
