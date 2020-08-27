@@ -47,6 +47,8 @@ Available subcommands:
                         csv
     get_taxa 
                         extracts taxa labels from tips in a tree
+    return_basal 
+                        returns a representative basal taxon
     label_transitions 
                         counts and labels transitions of traits on a tree
     prune 

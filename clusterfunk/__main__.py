@@ -379,7 +379,19 @@ def main(args=None):
 
     )
 
-    subparser_get_taxa.set_defaults(subprocess=clusterfunk.subprocesses.get_taxa.TaxaGetter)
+    subparser_get_taxa.set_defaults(
+            subprocess=clusterfunk.subprocesses.get_taxa.TaxaGetter)
+    # _____________________________ return_basal ______________________________#
+
+    subparser_return_basal = subparsers.add_parser(
+            "return_basal",
+            usage="clusterfunk return_basal  -i input.tree -o taxa.txt",
+            help="returns a representative basal taxon",
+            parents=[shared_arguments_parser]
+
+    )
+
+    subparser_return_basal.set_defaults(subprocess=clusterfunk.subprocesses.return_basal.BasalReturner)
 
     # _____________________________ label_transitions ______________________________#
 
