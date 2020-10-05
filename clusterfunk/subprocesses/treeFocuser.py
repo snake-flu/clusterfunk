@@ -52,7 +52,7 @@ class TreeFocuser(SubProcess):
             # How many are leafs? if above threshold collapse
             if number_of_disappointing_leafs > self.options.collapse_threshold:
                 if disappointing_child.is_leaf():
-                    removed_labels.append(disappointing_child.taxon.label)
+                    removed_labels.append((disappointing_child.taxon.label,disappointing_child.level()))
                     to_be_removed.append(disappointing_child)
 
             if not disappointing_child.is_leaf():
@@ -60,15 +60,20 @@ class TreeFocuser(SubProcess):
                 number_of_disappointing_descendents = len([child for child in disappointing_child.leaf_iter()])
                 if number_of_disappointing_descendents > self.options.collapse_threshold:
                     for leaf in disappointing_child.leaf_iter():
-                        removed_labels.append(leaf.taxon.label)
+                        removed_labels.append((leaf.taxon.label,leaf.level()))
                         # to_be_removed.append(disappointing_child)
                     to_be_removed.append(disappointing_child)
 
         if len(to_be_removed) > 0:
+            
             for disappointing_child in to_be_removed:
                 node.remove_child(disappointing_child)
             new_label = "inserted_node%d" % self.count
-            self.log.append({"taxon": new_label, "members": ",".join(removed_labels)})
+            
+            removed_labels = sorted(removed_labels, key = lambda x : x[1])
+            removed_labels_value = [i[0] for i in removed_labels]
+
+            self.log.append({"taxon": new_label, "members": ",".join(removed_labels_value)})
             new_taxon = dendropy.datamodel.taxonmodel.Taxon(label=new_label)
             self.nameSpace.add_taxon(new_taxon)
             node.insert_new_child(0, edge_length=0, taxon=new_taxon)
