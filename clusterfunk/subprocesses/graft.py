@@ -11,7 +11,12 @@ class Grafter(SubProcess):
         root_stock = RootStock(guide_tree)
 
         i = 0
-        for path in self.options.scions:
+        scion_dict = {}
+        for scion in self.options.scions:
+            prefix = scion.split('.')[0]
+            scion_dict[prefix] = scion
+        sorted_scions = [scion_dict[scion] for scion in sorted(scion_dict)]
+        for path in sorted_scions:
             scion_tree = prepare_tree(self.options, path)
             if self.options.annotate_scions is not None:
                 self.annotate_nodes(scion_tree, self.options.scion_annotation_name, self.options.annotate_scions[i])
