@@ -23,7 +23,7 @@ class AnnotationExtractor(SubProcess):
 
         with open(self.options.output, "w") as csvfile:
             fileheader = ["taxon"] + self.options.traits
-            writer = csv.DictWriter(csvfile, fieldnames=fileheader)
+            writer = csv.DictWriter(csvfile, fieldnames=fileheader, quoting=csv.QUOTE_MINIMAL, dialect = "unix")
             writer.writeheader()
             for tip_annotation in annotations:
                 writer.writerow(tip_annotation)
